@@ -1,0 +1,5181 @@
+{
+  "schema_version": 1,
+  "kernel_count": 65,
+  "kernels": [
+    {
+      "source": "cellindices.cu",
+      "name": "cellindices",
+      "arguments": [
+        {
+          "name": "dstx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "dsty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "dstz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "nx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "ny",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "nz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 7,
+      "source_sha256": "392a283b17928b2db7e94f904abcb75c0a8ca31a427dfa307d292518f0d30230"
+    },
+    {
+      "source": "copypadmul2.cu",
+      "name": "copypadmul2",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Dx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Dy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Dz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Sx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Sy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Sz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "vol",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 10,
+          "nullable": true
+        }
+      ],
+      "pointer_mask_buffer_index": 11,
+      "source_sha256": "7fc0d3e03ec0c3bdb39d99ad563fe2be4ec7ba96466dd1465f8b63cf31c8374b"
+    },
+    {
+      "source": "copyunpad.cu",
+      "name": "copyunpad",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Dx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Dy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Dz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Sx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Sy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Sz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 8,
+      "source_sha256": "462d64215d96be9df8707b69e5151ea909b85fbf3db900c890689783e7c133e0"
+    },
+    {
+      "source": "crop.cu",
+      "name": "crop",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Dx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Dy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Dz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Sx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Sy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Sz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "Offx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "Offy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "Offz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 11,
+      "source_sha256": "c6df94ec7e19b7ba2a5e089bd5b9b30a901d07b1d8246d5d78cf3b73f4bc0b86"
+    },
+    {
+      "source": "crossproduct.cu",
+      "name": "crossproduct",
+      "arguments": [
+        {
+          "name": "dstx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "dsty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "dstz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "ax",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "ay",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "az",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "bx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "by",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "bz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "58b38653fd88ef0e1a5fce2f272958736259390cc5f086eee0e8a43640c53d20"
+    },
+    {
+      "source": "cubicanisotropy2.cu",
+      "name": "addcubicanisotropy2",
+      "arguments": [
+        {
+          "name": "Bx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "By",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Bz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "k1_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": true
+        },
+        {
+          "name": "k1_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "k2_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 10,
+          "nullable": true
+        },
+        {
+          "name": "k2_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "k3_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 12,
+          "nullable": true
+        },
+        {
+          "name": "k3_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "c1x_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 14,
+          "nullable": true
+        },
+        {
+          "name": "c1x_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "c1y_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 16,
+          "nullable": true
+        },
+        {
+          "name": "c1y_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 17,
+          "nullable": false
+        },
+        {
+          "name": "c1z_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 18,
+          "nullable": true
+        },
+        {
+          "name": "c1z_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 19,
+          "nullable": false
+        },
+        {
+          "name": "c2x_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 20,
+          "nullable": true
+        },
+        {
+          "name": "c2x_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 21,
+          "nullable": false
+        },
+        {
+          "name": "c2y_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 22,
+          "nullable": true
+        },
+        {
+          "name": "c2y_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 23,
+          "nullable": false
+        },
+        {
+          "name": "c2z_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 24,
+          "nullable": true
+        },
+        {
+          "name": "c2z_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 25,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 26,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 27,
+      "source_sha256": "d72043efaae08f0ead176d377102b9915ec8fd5e4223822c4afaae59d318e62b"
+    },
+    {
+      "source": "div.cu",
+      "name": "pointwise_div",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "a",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "b",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "a72829d244caca20fc2d8bb903744570f0c1aadc386e35d3a97468c0013c33ea"
+    },
+    {
+      "source": "dmi.cu",
+      "name": "adddmi",
+      "arguments": [
+        {
+          "name": "Hx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Hy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Hz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "aLUT2d",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "dLUT2d",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "cx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "cy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "cz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 14,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 16,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 17,
+          "nullable": false
+        },
+        {
+          "name": "OpenBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 18,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 19,
+      "source_sha256": "12966b393b480ae864d454ee8b1613f36631d6427144378fb8241aa2298173b1"
+    },
+    {
+      "source": "dmibulk.cu",
+      "name": "adddmibulk",
+      "arguments": [
+        {
+          "name": "Hx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Hy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Hz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "aLUT2d",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "DLUT2d",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "cx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "cy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "cz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 14,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 16,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 17,
+          "nullable": false
+        },
+        {
+          "name": "OpenBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 18,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 19,
+      "source_sha256": "60073a0de2bad4ce0f74e1c96e468e3370b6e55596240f2cd0966b683703034a"
+    },
+    {
+      "source": "dotproduct.cu",
+      "name": "dotproduct",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "prefactor",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "ax",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "ay",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "az",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "bx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "by",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "bz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 9,
+      "source_sha256": "225d2c22e33cd734bcef7fe052bb957a4392792b2887d435e4c24e9bc0e49125"
+    },
+    {
+      "source": "exchange.cu",
+      "name": "addexchange",
+      "arguments": [
+        {
+          "name": "Bx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "By",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Bz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "aLUT2d",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "wx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "wy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "wz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 14,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 16,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 17,
+      "source_sha256": "6e44a70afa73daaa0a32cd5606a8f43e554110d5a1545e93d15fb17cd99a3685"
+    },
+    {
+      "source": "exchangedecode.cu",
+      "name": "exchangedecode",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "aLUT2d",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "wx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "wy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "wz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "33586e4d31d5afa6ea9ac16dd592718a03583a42803a70d08bf1fceb5b5f1b9f"
+    },
+    {
+      "source": "hopf-emergentmagneticfield-solidangle.cu",
+      "name": "setemergentmagneticfieldsolidangle",
+      "arguments": [
+        {
+          "name": "Fx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Fy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Fz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "prefactor",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "icycz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "iczcx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "icxcy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 13,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 14,
+      "source_sha256": "b38c2ec8dbae1039ea6f7c74d13a0e1b1ff50f18ea206b4aa42e5508df3def65"
+    },
+    {
+      "source": "hopf-emergentmagneticfieldfivepoint.cu",
+      "name": "setemergentmagneticfieldfivepoint",
+      "arguments": [
+        {
+          "name": "Fx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Fy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Fz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "prefactor",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "icycz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "iczcx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "icxcy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 13,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 14,
+      "source_sha256": "ebd40dca31233fbcbb81f794e4f20d9f2de3bcdf79d17398e7259841cc1dae18"
+    },
+    {
+      "source": "hopf-emergentmagneticfieldtwopoint.cu",
+      "name": "setemergentmagneticfieldtwopoint",
+      "arguments": [
+        {
+          "name": "Fx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Fy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Fz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "prefactor",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "icycz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "iczcx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "icxcy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 13,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 14,
+      "source_sha256": "72f9386d3bfad3660a74998857f29109cd70f8b12689990f96ba022a0bb76d0c"
+    },
+    {
+      "source": "hopf-vectorpotential.cu",
+      "name": "setvectorpotential",
+      "arguments": [
+        {
+          "name": "Ax",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Ay",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Az",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Fx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Fy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Fz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "cy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 10,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 11,
+      "source_sha256": "38ed6c4e195521a1a7364b432bb83f7dac1cab6529283dfa524c00da42bec4b6"
+    },
+    {
+      "source": "hopfindex-solidangle-fourier-field.cu",
+      "name": "solidanglefourierfield",
+      "arguments": [
+        {
+          "name": "fftFx_partial",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "fftFy_partial",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fftFz_partial",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "fftFx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fftFy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "fftFz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 9,
+      "source_sha256": "81d77a5298a328f29ad5767a04718ea9c32d811be75b48ed3e5302722ad64300"
+    },
+    {
+      "source": "hopfindex-solidangle-fourier-scale.cu",
+      "name": "scaleemergentfield",
+      "arguments": [
+        {
+          "name": "Fx_scale",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Fy_scale",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Fz_scale",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Fx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Fy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Fz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "cx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "cy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "cz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 11,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 12,
+      "source_sha256": "fd29decaaa1deb8c9ad3f62eb524d46a6c442b488c11096b1ce6d00de27dba8e"
+    },
+    {
+      "source": "hopfindex-solidangle-fourier-summand.cu",
+      "name": "solidanglefouriersummand",
+      "arguments": [
+        {
+          "name": "summand_array",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "FkX_array",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "FkY_array",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "FkZ_array",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 7,
+      "source_sha256": "10968bbddad1e724f1d975465323bba30623550070bee5ac7a4f68c78479ad95"
+    },
+    {
+      "source": "kernmulc.cu",
+      "name": "kernmulC",
+      "arguments": [
+        {
+          "name": "fftM",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "fftK",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "d3d1ac35db99dba5e10ce388339b246b1b363debed9e65ef0b9fffaad6a3143c"
+    },
+    {
+      "source": "kernmulrsymm2dxy.cu",
+      "name": "kernmulRSymm2Dxy",
+      "arguments": [
+        {
+          "name": "fftMx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "fftMy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fftKxx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "fftKyy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fftKxy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 7,
+      "source_sha256": "01c0c15173b5e30fe6293937fb21ce46137532cdb9206b529ad9cdda5cd9603e"
+    },
+    {
+      "source": "kernmulrsymm2dz.cu",
+      "name": "kernmulRSymm2Dz",
+      "arguments": [
+        {
+          "name": "fftMz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "fftKzz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "36de5dbcb4660cf75df6a6f6befff808f50c91e86d6f015f62cb262557d61fca"
+    },
+    {
+      "source": "kernmulrsymm3d.cu",
+      "name": "kernmulRSymm3D",
+      "arguments": [
+        {
+          "name": "fftMx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "fftMy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fftMz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "fftKxx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fftKyy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "fftKzz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "fftKyz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "fftKxz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "fftKxy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 11,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 12,
+      "source_sha256": "f52699cfabb81ce5eec321aeb6a00fa27a37b3f93ebd6666295dd7b007e9909b"
+    },
+    {
+      "source": "llnoprecess.cu",
+      "name": "llnoprecess",
+      "arguments": [
+        {
+          "name": "tx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "ty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "tz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "hx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "hy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "hz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "caff3e22cd975869fefbd9c976e9726cf77329a04176c7669cfe52b5123b0b5f"
+    },
+    {
+      "source": "lltorque2.cu",
+      "name": "lltorque2",
+      "arguments": [
+        {
+          "name": "tx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "ty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "tz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "hx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "hy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "hz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "alpha_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 9,
+          "nullable": true
+        },
+        {
+          "name": "alpha_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 11,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 12,
+      "source_sha256": "2799b374ebcc8fa0a4fa94e8a61ae9e560e77e8a1952e1a377727ccd7506f2d9"
+    },
+    {
+      "source": "madd2.cu",
+      "name": "madd2",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fac1",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "src2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fac2",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 6,
+      "source_sha256": "e8a4d282cd4766ed69c053f6801d2f19088fdf9833e3d2c4e260a2716b124719"
+    },
+    {
+      "source": "madd3.cu",
+      "name": "madd3",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fac1",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "src2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fac2",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "src3",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "fac3",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 8,
+      "source_sha256": "fd4805e5486e9846cd1edd3796abdcff666f9f77707a37a37194f22fbbdc82aa"
+    },
+    {
+      "source": "madd4.cu",
+      "name": "madd4",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fac1",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "src2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fac2",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "src3",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "fac3",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "src4",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "fac4",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "dbbb4448d4fd5a0062ecc6919e313cfc5542df7e0f9795f32a30d4eb15e87f82"
+    },
+    {
+      "source": "madd5.cu",
+      "name": "madd5",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fac1",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "src2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fac2",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "src3",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "fac3",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "src4",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "fac4",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "src5",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "fac5",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 11,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 12,
+      "source_sha256": "b823922f8eb5f6f6ad82dd0e202698b584d41cf2041b660ea01ead5e9f3cae39"
+    },
+    {
+      "source": "madd6.cu",
+      "name": "madd6",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fac1",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "src2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fac2",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "src3",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "fac3",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "src4",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "fac4",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "src5",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "fac5",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "src6",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "fac6",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 13,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 14,
+      "source_sha256": "472051fae4ee36afa457cc9f00db297eef4f1cf6599965f632ad6fe00efb239b"
+    },
+    {
+      "source": "madd7.cu",
+      "name": "madd7",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fac1",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "src2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "fac2",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "src3",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "fac3",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "src4",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "fac4",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "src5",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "fac5",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "src6",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "fac6",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "src7",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "fac7",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 14,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 15,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 16,
+      "source_sha256": "b9b60abe7a3229016aa0079333b7b6f5f3b768b3303e788fdb84364f7efa79c6"
+    },
+    {
+      "source": "magnetoelasticfield.cu",
+      "name": "addmagnetoelasticfield",
+      "arguments": [
+        {
+          "name": "Bx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "By",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Bz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "exx_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "exx_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "eyy_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": true
+        },
+        {
+          "name": "eyy_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "ezz_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 10,
+          "nullable": true
+        },
+        {
+          "name": "ezz_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "exy_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 12,
+          "nullable": true
+        },
+        {
+          "name": "exy_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "exz_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 14,
+          "nullable": true
+        },
+        {
+          "name": "exz_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "eyz_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 16,
+          "nullable": true
+        },
+        {
+          "name": "eyz_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 17,
+          "nullable": false
+        },
+        {
+          "name": "B1_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 18,
+          "nullable": true
+        },
+        {
+          "name": "B1_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 19,
+          "nullable": false
+        },
+        {
+          "name": "B2_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 20,
+          "nullable": true
+        },
+        {
+          "name": "B2_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 21,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 22,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 23,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 24,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 25,
+      "source_sha256": "df738df78a2c3323704fd996c5a8c7d7209e0a097d94beae239dd36d59c8c220"
+    },
+    {
+      "source": "magnetoelasticforce.cu",
+      "name": "getmagnetoelasticforce",
+      "arguments": [
+        {
+          "name": "fx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "fy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "fz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "B1_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "B1_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "B2_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": true
+        },
+        {
+          "name": "B2_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "rcsx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 10,
+          "nullable": false
+        },
+        {
+          "name": "rcsy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "rcsz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 12,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 14,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 16,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 17,
+      "source_sha256": "709cb93b2a868b466fcd6eb5791eb63115681c8788c9c6def677ccb9c43d9113"
+    },
+    {
+      "source": "maxangle.cu",
+      "name": "setmaxangle",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "aLUT2d",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "4b2fcba2417d8eb54021a1d447c45effeeec352d51ac6c0b1115a602381e6888"
+    },
+    {
+      "source": "minimize.cu",
+      "name": "minimize",
+      "arguments": [
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "m0x",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "m0y",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "m0z",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "tx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "ty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "tz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "dt",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 11,
+      "source_sha256": "c8370dc86d367719958337a39fc8962579daaf582399c16f7f235461ecd1783c"
+    },
+    {
+      "source": "mul.cu",
+      "name": "mul",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "a",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "b",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "efcee07613c7b01120b0889b466bc5fa3d16bff273ffbdf7f4182b144ac3f49f"
+    },
+    {
+      "source": "normalize.cu",
+      "name": "normalize",
+      "arguments": [
+        {
+          "name": "vx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "vy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "vz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "vol",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": true
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 5,
+      "source_sha256": "3600f30759a68304e4e10aa47e85053f623b239ea7a7c355504d969c5c8750ea"
+    },
+    {
+      "source": "phi.cu",
+      "name": "setPhi",
+      "arguments": [
+        {
+          "name": "phi",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 6,
+      "source_sha256": "8ace2046629826531e747f78b6e438becc64777ceb5939f9329256375cb220e8"
+    },
+    {
+      "source": "reducedot.cu",
+      "name": "reducedot",
+      "arguments": [
+        {
+          "name": "x1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "x2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "initVal",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "n",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 5,
+      "source_sha256": "08659e8e6bb6eab72604fdd6c9e046bff457bf76498d82276e22e9e2230380cd"
+    },
+    {
+      "source": "reducemaxabs.cu",
+      "name": "reducemaxabs",
+      "arguments": [
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "initVal",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "n",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "81a544a3b0261d01f524b53b432ddf68087de6af93450f5e64d9babfb153f4d3"
+    },
+    {
+      "source": "reducemaxdiff.cu",
+      "name": "reducemaxdiff",
+      "arguments": [
+        {
+          "name": "src1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "initVal",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "n",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 5,
+      "source_sha256": "51aae93cf6835e6844dbec325ba9ad638075d1e5dc6b73cf0faabc726b918740"
+    },
+    {
+      "source": "reducemaxvecdiff2.cu",
+      "name": "reducemaxvecdiff2",
+      "arguments": [
+        {
+          "name": "x1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "y1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "z1",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "x2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "y2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "z2",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "initVal",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "n",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 9,
+      "source_sha256": "53f1b3694505a0c548f3ec333a23a9062815e144241211ae01f639f3b29958d6"
+    },
+    {
+      "source": "reducemaxvecnorm2.cu",
+      "name": "reducemaxvecnorm2",
+      "arguments": [
+        {
+          "name": "x",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "y",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "z",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "initVal",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "n",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 6,
+      "source_sha256": "0d5432719d537ca63e69a14fc994e1d539298fa32b05ffee0f3be7673e81c6ed"
+    },
+    {
+      "source": "reducesum.cu",
+      "name": "reducesum",
+      "arguments": [
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "initVal",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "n",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "6d6fa06e2834c2e607901344205058470f2f106fef9d9513af0630b9e9b2d0cb"
+    },
+    {
+      "source": "regionadds.cu",
+      "name": "regionadds",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "LUT",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "138ac0d72ac53f9f28e7e99e44d3bad594c58cfa38247cbcdc829322a5e3d5f9"
+    },
+    {
+      "source": "regionaddv.cu",
+      "name": "regionaddv",
+      "arguments": [
+        {
+          "name": "dstx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "dsty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "dstz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "LUTx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "LUTy",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "LUTz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 8,
+      "source_sha256": "0aabaec4c4cd24c958619f0dfd6e1f750c29c453c67b10645d0ecb187847cbdb"
+    },
+    {
+      "source": "regiondecode.cu",
+      "name": "regiondecode",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "LUT",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "e55fd48be2a927f6e81548dee993c0e08e32477e1a53b4e1ee6eadf10be0f08e"
+    },
+    {
+      "source": "regionselect.cu",
+      "name": "regionselect",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "region",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 5,
+      "source_sha256": "9ce90a43a5022aab3a8f0d5a2a2ecba8e74b01aede2ffe78a2b78427676f4bf0"
+    },
+    {
+      "source": "resize.cu",
+      "name": "resize",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "Dx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Dy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Dz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Sx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Sy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Sz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "layer",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "scalex",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "scaley",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 10,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 11,
+      "source_sha256": "49800fa5fed124ac0d2ed2ba53b968111f5938d91e26506fe8466f2e1523b47d"
+    },
+    {
+      "source": "shiftbytes.cu",
+      "name": "shiftbytes",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "shx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "clamp",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 6,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 7,
+      "source_sha256": "f27b0c238379ee5f13333c9ea62ab659cd63a5c4b0f7f71f4d72618287a90d05"
+    },
+    {
+      "source": "shiftbytesy.cu",
+      "name": "shiftbytesy",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "shy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "clamp",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 6,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 7,
+      "source_sha256": "98ebe9a14615e300e6c5e0d4f2e53cd34755857eeb5ae5b2f6e7bac629f2845d"
+    },
+    {
+      "source": "shiftedgecarryx.cu",
+      "name": "shiftedgecarryX",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "othercomp",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "anothercomp",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "shx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "clampL",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "clampR",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "6dcd5752c2e950a1a6f8792a3f75075ec6e6b8a5c99f96ff3e401c7a1765ad2b"
+    },
+    {
+      "source": "shiftedgecarryy.cu",
+      "name": "shiftedgecarryY",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "othercomp",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "anothercomp",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "shy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "clampD",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "clampU",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "d93f1a580ebeb4ec94f6ed073a21b2fc37dec17281293c0dafaf5b94004ef79e"
+    },
+    {
+      "source": "shiftx.cu",
+      "name": "shiftx",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "shx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "clampL",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "clampR",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 8,
+      "source_sha256": "31dd76cd4d4fd99b0b43c3e3f679cf2708eefbbdedff2c9df312d3497bff9ae4"
+    },
+    {
+      "source": "shifty.cu",
+      "name": "shifty",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "shy",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "clampD",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "clampU",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 8,
+      "source_sha256": "9db1f59ba7f1b47e7e2e8ba57602455ef9a03363f3f7cdaf91597f8c232dc237"
+    },
+    {
+      "source": "shiftz.cu",
+      "name": "shiftz",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "src",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "shz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "clampB",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "clampF",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 8,
+      "source_sha256": "471d278fd7665f62214472238ef42d7d5da5be07443c485105cc4d37eabd39c6"
+    },
+    {
+      "source": "slonczewski2.cu",
+      "name": "addslonczewskitorque2",
+      "arguments": [
+        {
+          "name": "tx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "ty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "tz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "jz_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": true
+        },
+        {
+          "name": "jz_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "px_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 10,
+          "nullable": true
+        },
+        {
+          "name": "px_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "py_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 12,
+          "nullable": true
+        },
+        {
+          "name": "py_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "pz_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 14,
+          "nullable": true
+        },
+        {
+          "name": "pz_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "alpha_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 16,
+          "nullable": true
+        },
+        {
+          "name": "alpha_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 17,
+          "nullable": false
+        },
+        {
+          "name": "pol_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 18,
+          "nullable": true
+        },
+        {
+          "name": "pol_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 19,
+          "nullable": false
+        },
+        {
+          "name": "lambda_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 20,
+          "nullable": true
+        },
+        {
+          "name": "lambda_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 21,
+          "nullable": false
+        },
+        {
+          "name": "epsPrime_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 22,
+          "nullable": true
+        },
+        {
+          "name": "epsPrime_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 23,
+          "nullable": false
+        },
+        {
+          "name": "thickness_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 24,
+          "nullable": true
+        },
+        {
+          "name": "thickness_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 25,
+          "nullable": false
+        },
+        {
+          "name": "meshThickness",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 26,
+          "nullable": false
+        },
+        {
+          "name": "freeLayerPosition",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 27,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 28,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 29,
+      "source_sha256": "43ae8b36ce1623d810e9596dae1e5969ddb43d289b948cec616a42ebed95fd67"
+    },
+    {
+      "source": "temperature2.cu",
+      "name": "settemperature2",
+      "arguments": [
+        {
+          "name": "B",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "noise",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "kB2_VgammaDt",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "temp_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": true
+        },
+        {
+          "name": "temp_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "alpha_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 7,
+          "nullable": true
+        },
+        {
+          "name": "alpha_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 8,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 9,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 10,
+      "source_sha256": "a7ea18f262346aa84ded7c626e61d7753589c3faa45519cc1c23ef9dac74480e"
+    },
+    {
+      "source": "theta.cu",
+      "name": "setTheta",
+      "arguments": [
+        {
+          "name": "theta",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 4,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 5,
+      "source_sha256": "058c6848d869154a6cbb1b22402cd8cdca5035f799dc659157b1a9d0ef31cbc9"
+    },
+    {
+      "source": "topologicalcharge-lattice.cu",
+      "name": "settopologicalchargelattice",
+      "arguments": [
+        {
+          "name": "s",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "icxcy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 8,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 9,
+      "source_sha256": "b1f908043e2eea3779ecc860673e2907489c6f8043324efe0bc4697ffa311097"
+    },
+    {
+      "source": "topologicalcharge.cu",
+      "name": "settopologicalcharge",
+      "arguments": [
+        {
+          "name": "s",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "icxcy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 6,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 8,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 9,
+      "source_sha256": "98681cb18729a058e659235fe41b85b71bb393f15b36e58812612c7fa74da087"
+    },
+    {
+      "source": "uniaxialanisotropy2.cu",
+      "name": "adduniaxialanisotropy2",
+      "arguments": [
+        {
+          "name": "Bx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "By",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "Bz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "K1_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": true
+        },
+        {
+          "name": "K1_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "K2_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 10,
+          "nullable": true
+        },
+        {
+          "name": "K2_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "ux_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 12,
+          "nullable": true
+        },
+        {
+          "name": "ux_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "uy_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 14,
+          "nullable": true
+        },
+        {
+          "name": "uy_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "uz_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 16,
+          "nullable": true
+        },
+        {
+          "name": "uz_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 17,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 18,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 19,
+      "source_sha256": "ab8d7ecadfe90b6ce6ac2701638dbd05de085753fc18242a1eed21689ce02871"
+    },
+    {
+      "source": "zeromask.cu",
+      "name": "zeromask",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "maskLUT",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "97832c4d02adb90a00281817717f2a19896a9d55794db011488770918966031d"
+    },
+    {
+      "source": "zeromaskinv.cu",
+      "name": "zeromaskinv",
+      "arguments": [
+        {
+          "name": "dst",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "maskLUT",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "regions",
+          "c_type": "uint8_t*",
+          "kind": "buffer_uint8",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "N",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 3,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 4,
+      "source_sha256": "588da7f87caff3231abfb73193c46d764caf2299f13cbb8ef0febe23004f8514"
+    },
+    {
+      "source": "zhangli2.cu",
+      "name": "addzhanglitorque2",
+      "arguments": [
+        {
+          "name": "tx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 0,
+          "nullable": false
+        },
+        {
+          "name": "ty",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 1,
+          "nullable": false
+        },
+        {
+          "name": "tz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 2,
+          "nullable": false
+        },
+        {
+          "name": "mx",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 3,
+          "nullable": false
+        },
+        {
+          "name": "my",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 4,
+          "nullable": false
+        },
+        {
+          "name": "mz",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 5,
+          "nullable": false
+        },
+        {
+          "name": "Ms_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 6,
+          "nullable": true
+        },
+        {
+          "name": "Ms_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 7,
+          "nullable": false
+        },
+        {
+          "name": "jx_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 8,
+          "nullable": true
+        },
+        {
+          "name": "jx_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 9,
+          "nullable": false
+        },
+        {
+          "name": "jy_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 10,
+          "nullable": true
+        },
+        {
+          "name": "jy_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 11,
+          "nullable": false
+        },
+        {
+          "name": "jz_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 12,
+          "nullable": true
+        },
+        {
+          "name": "jz_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 13,
+          "nullable": false
+        },
+        {
+          "name": "alpha_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 14,
+          "nullable": true
+        },
+        {
+          "name": "alpha_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 15,
+          "nullable": false
+        },
+        {
+          "name": "xi_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 16,
+          "nullable": true
+        },
+        {
+          "name": "xi_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 17,
+          "nullable": false
+        },
+        {
+          "name": "pol_",
+          "c_type": "float*",
+          "kind": "buffer_float32",
+          "buffer_index": 18,
+          "nullable": true
+        },
+        {
+          "name": "pol_mul",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 19,
+          "nullable": false
+        },
+        {
+          "name": "cx",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 20,
+          "nullable": false
+        },
+        {
+          "name": "cy",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 21,
+          "nullable": false
+        },
+        {
+          "name": "cz",
+          "c_type": "float",
+          "kind": "float32",
+          "buffer_index": 22,
+          "nullable": false
+        },
+        {
+          "name": "Nx",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 23,
+          "nullable": false
+        },
+        {
+          "name": "Ny",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 24,
+          "nullable": false
+        },
+        {
+          "name": "Nz",
+          "c_type": "int",
+          "kind": "int32",
+          "buffer_index": 25,
+          "nullable": false
+        },
+        {
+          "name": "PBC",
+          "c_type": "uint8_t",
+          "kind": "uint8",
+          "buffer_index": 26,
+          "nullable": false
+        }
+      ],
+      "pointer_mask_buffer_index": 27,
+      "source_sha256": "ef540dad1f7d77d2c5e23764c39da88b94b5fe938e060879f17abbc3ea101fec"
+    }
+  ]
+}

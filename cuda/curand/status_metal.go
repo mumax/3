@@ -1,0 +1,45 @@
+//go:build darwin && arm64
+// +build darwin,arm64
+
+package curand
+
+import "fmt"
+
+type Status int
+
+const (
+	SUCCESS               Status = 0
+	VERSION_MISMATCH      Status = 100
+	NOT_INITIALIZED       Status = 101
+	ALLOCATION_FAILED     Status = 102
+	TYPE_ERROR            Status = 103
+	OUT_OF_RANGE          Status = 104
+	LENGTH_NOT_MULTIPLE   Status = 105
+	LAUNCH_FAILURE        Status = 201
+	PREEXISTING_FAILURE   Status = 202
+	INITIALIZATION_FAILED Status = 203
+	ARCH_MISMATCH         Status = 204
+	INTERNAL_ERROR        Status = 999
+)
+
+func (s Status) String() string {
+	if str, ok := statusStr[s]; ok {
+		return str
+	}
+	return fmt.Sprint("CURAND ERROR NUMBER ", int(s))
+}
+
+var statusStr = map[Status]string{
+	SUCCESS:               "CURAND_STATUS_SUCCESS",
+	VERSION_MISMATCH:      "CURAND_STATUS_VERSION_MISMATCH",
+	NOT_INITIALIZED:       "CURAND_STATUS_NOT_INITIALIZED",
+	ALLOCATION_FAILED:     "CURAND_STATUS_ALLOCATION_FAILED",
+	TYPE_ERROR:            "CURAND_STATUS_TYPE_ERROR",
+	OUT_OF_RANGE:          "CURAND_STATUS_OUT_OF_RANGE",
+	LENGTH_NOT_MULTIPLE:   "CURAND_STATUS_LENGTH_NOT_MULTIPLE",
+	LAUNCH_FAILURE:        "CURAND_STATUS_LAUNCH_FAILURE",
+	PREEXISTING_FAILURE:   "CURAND_STATUS_PREEXISTING_FAILURE",
+	INITIALIZATION_FAILED: "CURAND_STATUS_INITIALIZATION_FAILED",
+	ARCH_MISMATCH:         "CURAND_STATUS_ARCH_MISMATCH",
+	INTERNAL_ERROR:        "CURAND_STATUS_INTERNAL_ERROR",
+}

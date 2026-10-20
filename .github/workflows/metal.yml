@@ -1,0 +1,102 @@
+name: Apple Silicon Metal
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metal-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MACOSX_DEPLOYMENT_TARGET: "14.0"
+
+jobs:
+  build:
+    name: Compile and static checks
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Confirm Apple Silicon toolchain
+        run: |
+          test "$(uname -s)" = Darwin
+          test "$(uname -m)" = arm64
+          go version
+          xcrun --show-sdk-version
+
+      - name: Verify generated Metal sources
+        run: |
+          python3 cuda/metal/cmd/cuda2metal/generate.py --check
+          python3 -m unittest discover -s cuda/metal/cmd/cuda2metal -p 'test_*.py'
+
+      - name: Compile every Metal kernel
+        run: |
+          xcrun -f metal
+          xcrun -f metallib
+          make metal-shaders
+
+      - name: Run platform-independent numerical tests
+        run: CGO_ENABLED=0 go test ./cuda/metal/fft ./cuda/metal/rng
+
+      - name: Compile and link Metal test binaries without a GPU
+        run: go test -run '^$' ./cuda/metal/...
+
+      - name: Compile all Go packages for Darwin arm64
+        run: |
+          test "$(go list -f '{{len .CXXFiles}}' ./cuda/metal)" -eq 1
+          test "$(go list -f '{{len .CXXFiles}}' ./cuda/metal/fft)" -eq 1
+          test "$(go list -f '{{len .CXXFiles}}' ./cuda/metal/rng)" -eq 1
+          go build ./...
+
+  gpu:
+    name: GPU numerical regression and benchmarks
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[metal-gpu]'))
+    runs-on: macos-15-xlarge
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Record Apple GPU
+        run: |
+          uname -a
+          system_profiler SPDisplaysDataType
+
+      - name: Verify and compile Metal sources
+        run: |
+          xcrun -f metal
+          xcrun -f metallib
+          make metal-shaders
+
+      - name: Run Go and GPU numerical tests
+        run: go test -vet=off -timeout 45m ./...
+
+      - name: Build mumax3
+        run: |
+          go install ./cmd/mumax3
+          "$(go env GOPATH)/bin/mumax3" -test
+
+      - name: Run Metal benchmarks
+        run: go test -run '^$' -bench . -benchmem ./cuda/metal/...
+
+      - name: Run the mumax3 regression suite
+        run: |
+          mumax3_binary="$(go env GOPATH)/bin/mumax3"
+          cd test
+          ./run.bash "$mumax3_binary"

@@ -1,3 +1,6 @@
+//go:build !darwin || !arm64
+// +build !darwin !arm64
+
 // Package cuda provides GPU interaction
 package cuda
 
@@ -11,13 +14,15 @@ import (
 )
 
 var (
-	DriverVersion int        // cuda driver version
-	DevName       string     // GPU name
-	TotalMem      int64      // total GPU memory
-	GPUInfo       string     // Human-readable GPU description
-	Synchronous   bool       // for debug: synchronize stream0 at every kernel launch
-	cudaCtx       cu.Context // global CUDA context
-	cudaCC        int        // compute capablity (used for fatbin)
+	Backend        = "CUDA" // active GPU compute backend
+	BackendVersion = fmt.Sprintf("%d.%d", cu.CUDA_VERSION/1000, (cu.CUDA_VERSION%1000)/10)
+	DriverVersion  int        // cuda driver version
+	DevName        string     // GPU name
+	TotalMem       int64      // total GPU memory
+	GPUInfo        string     // Human-readable GPU description
+	Synchronous    bool       // for debug: synchronize stream0 at every kernel launch
+	cudaCtx        cu.Context // global CUDA context
+	cudaCC         int        // compute capablity (used for fatbin)
 )
 
 // Locks to an OS thread and initializes CUDA for that thread.

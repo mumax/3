@@ -25,14 +25,14 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	// Cache disabled
 	if cacheDir == "" {
 		util.Log(`//Not using kernel cache (-cache="")`)
-		return CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
+		return calcKernel(inputSize, pbc, cellsize, accuracy)
 	}
 
 	// Error-resilient kernel cache: if anything goes wrong, return calculated kernel.
 	defer func() {
 		if err := recover(); err != nil {
 			util.Log("//Unable to use kernel cache:", err)
-			kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
+			kernel = calcKernel(inputSize, pbc, cellsize, accuracy)
 		}
 	}()
 
@@ -67,7 +67,7 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 
 	// Could not load kernel: calculate it and save
 	var errSave error
-	kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
+	kernel = calcKernel(inputSize, pbc, cellsize, accuracy)
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
 			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {

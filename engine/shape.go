@@ -5,6 +5,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"math"
+	"strings"
 
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/httpfs"
@@ -445,7 +446,7 @@ func (s Shape) Repeat(periodX, periodY, periodZ float64) Shape {
 // Lattice2D returns copies of the shape at i·a1 + j·a2, with lattice vectors
 // a1 = (a1x, a1y) and a2 = (a2x, a2y) in meter and i = 0…n1-1, j = 0…n2-1.
 // n = 1 is the shape itself, n = 2 adds one copy displaced by the vector,
-// n = 0 repeats infinitely in both directions (i, j any integer).
+// n = 0 repeats infinitely in that direction (any integer index).
 // Overlapping copies are merged (union). Each point is tested against the
 // 3×3 nearest copies only, so the result is exact as long as the shape lies
 // within ±1.5 lattice vectors of its origin (fractional coordinates |u|, |v| < 1.5);
@@ -453,39 +454,10 @@ func (s Shape) Repeat(periodX, periodY, periodZ float64) Shape {
 // A zero vector (or n = 1) means no repetition in that direction.
 func (s Shape) Lattice2D(a1x, a1y, a2x, a2y float64, n1, n2 int) Shape {
 	util.AssertMsg(n1 >= 0 && n2 >= 0, "Lattice: number of copies must be ≥ 0 (0 = infinite)")
-	for _, a := range []float64{a1x, a1y, a2x, a2y} {
-		util.AssertMsg(!math.IsNaN(a) && !math.IsInf(a, 0), "Lattice: lattice vectors must be finite")
-	}
-	// A direction without repetition: zero vector (all copies coincide) or a single copy.
-	no1 := n1 == 1 || (a1x == 0 && a1y == 0)
-	no2 := n2 == 1 || (a2x == 0 && a2y == 0)
-	switch {
-	case no1 && no2:
-		return s
-	case no2:
-		return s.lattice1D(a1x, a1y, n1)
-	case no1:
-		return s.lattice1D(a2x, a2y, n2)
-	}
-	det := a1x*a2y - a1y*a2x
-	util.AssertMsg(math.Abs(det) > 1e-9*math.Hypot(a1x, a1y)*math.Hypot(a2x, a2y),
-		"Lattice2D: lattice vectors are parallel, use Lattice1D")
-	return func(x, y, z float64) bool {
-		// fractional coordinates of (x, y), rounded to the nearest lattice index
-		i0 := math.Round((a2y*x - a2x*y) / det)
-		j0 := math.Round((a1x*y - a1y*x) / det)
-		for i := i0 - 1; i <= i0+1; i++ {
-			if !latticeIndexOK(i, n1) {
-				continue
-			}
-			for j := j0 - 1; j <= j0+1; j++ {
-				if latticeIndexOK(j, n2) && s(x-i*a1x-j*a2x, y-i*a1y-j*a2y, z) {
-					return true
-				}
-			}
-		}
-		return false
-	}
+	in := func(i float64, n int) bool { return n == 0 || (i >= 0 && i < float64(n)) }
+	return s.lattice(a1x, a1y, a2x, a2y, n1 != 1, n2 != 1, func(i, j float64) bool {
+		return in(i, n1) && in(j, n2)
+	})
 }
 
 // Lattice1D returns copies of the shape at i·a, a = (ax, ay) in meter,
@@ -495,23 +467,92 @@ func (s Shape) Lattice1D(ax, ay float64, n int) Shape {
 	return s.Lattice2D(ax, ay, 0, 0, n, 1)
 }
 
-// lattice1D: union of the 3 copies nearest to the point along a (a ≠ 0).
-func (s Shape) lattice1D(ax, ay float64, n int) Shape {
-	a2 := ax*ax + ay*ay
+// SymmetricLattice2D returns copies of the shape at i·a1 + j·a2 (lattice vectors
+// in meter) for all integers i, j with distance(i, j) ≤ n-1, i.e. n "onion layers"
+// around the shape itself: n = 1 is the shape, n = 2 adds the nearest layer.
+// metric is "chebyshev" (max(|i|, |j|): n = 2 gives 9 shapes), "taxicab"
+// (|i| + |j|: 5 shapes), "euclidean" (√(i² + j²)) or "hexagonal" (7 shapes:
+// cube coordinates, a third axis along the shorter diagonal of a1, a2; a perfect
+// hexagon for |a1| = |a2| at 60° or 120°). n may be fractional; except for
+// euclidean this is the same as floor(n). n = 0 (or inf) is infinite.
+// Same 3×3 evaluation and exactness condition as Lattice2D.
+func (s Shape) SymmetricLattice2D(a1x, a1y, a2x, a2y, n float64, metric string) Shape {
+	util.AssertMsg(n == 0 || n >= 1, "SymmetricLattice2D: number of layers must be ≥ 1 (0 = infinite)")
+	r := n - 1
+	if n == 0 {
+		r = math.Inf(1)
+	}
+	var ok func(i, j float64) bool
+	switch strings.ToLower(metric) {
+	case "chebyshev":
+		ok = func(i, j float64) bool { return math.Max(math.Abs(i), math.Abs(j)) <= r }
+	case "taxicab":
+		ok = func(i, j float64) bool { return math.Abs(i)+math.Abs(j) <= r }
+	case "euclidean":
+		ok = func(i, j float64) bool { return i*i+j*j <= r*r }
+	case "hexagonal":
+		// Cube coordinates (i, j, k) with i + j + k = 0 and distance max(|i|, |j|, |k|):
+		// the plane i + j + k = 0 cuts the Chebyshev cube in a hexagon. The third
+		// axis must be the shorter diagonal: a1 - a2 if a1·a2 > 0 (k = -(i+j)), else a1 + a2.
+		sj := 1.0
+		if a1x*a2x+a1y*a2y < 0 {
+			sj = -1
+		}
+		ok = func(i, j float64) bool { return math.Max(math.Max(math.Abs(i), math.Abs(j)), math.Abs(i+sj*j)) <= r }
+	default:
+		util.AssertMsg(false, "SymmetricLattice2D: metric \""+metric+"\" unknown, use \"chebyshev\", \"taxicab\", \"euclidean\" or \"hexagonal\"")
+	}
+	return s.lattice(a1x, a1y, a2x, a2y, r >= 1, r >= 1, ok)
+}
+
+// lattice returns the union of the copies of s at i·a1 + j·a2 for which ok(i, j),
+// testing only the 3×3 copies nearest to each point. rep1, rep2: whether the
+// direction is repeated at all; zero vectors are treated as not repeated.
+func (s Shape) lattice(a1x, a1y, a2x, a2y float64, rep1, rep2 bool, ok func(i, j float64) bool) Shape {
+	for _, a := range []float64{a1x, a1y, a2x, a2y} {
+		util.AssertMsg(!math.IsNaN(a) && !math.IsInf(a, 0), "Lattice: lattice vectors must be finite")
+	}
+	// A direction without repetition: zero vector (all copies coincide) or a single copy.
+	rep1 = rep1 && (a1x != 0 || a1y != 0)
+	rep2 = rep2 && (a2x != 0 || a2y != 0)
+	switch {
+	case !rep1 && !rep2:
+		return s
+	case !rep2:
+		return s.lattice1D(a1x, a1y, func(i float64) bool { return ok(i, 0) })
+	case !rep1:
+		return s.lattice1D(a2x, a2y, func(j float64) bool { return ok(0, j) })
+	}
+	det := a1x*a2y - a1y*a2x
+	util.AssertMsg(math.Abs(det) > 1e-9*math.Hypot(a1x, a1y)*math.Hypot(a2x, a2y),
+		"Lattice: lattice vectors are parallel, use Lattice1D")
 	return func(x, y, z float64) bool {
-		i0 := math.Round((x*ax + y*ay) / a2)
+		// fractional coordinates of (x, y), rounded to the nearest lattice index
+		i0 := math.Round((a2y*x - a2x*y) / det)
+		j0 := math.Round((a1x*y - a1y*x) / det)
 		for i := i0 - 1; i <= i0+1; i++ {
-			if latticeIndexOK(i, n) && s(x-i*ax, y-i*ay, z) {
-				return true
+			for j := j0 - 1; j <= j0+1; j++ {
+				if ok(i, j) && s(x-i*a1x-j*a2x, y-i*a1y-j*a2y, z) {
+					return true
+				}
 			}
 		}
 		return false
 	}
 }
 
-// latticeIndexOK reports whether lattice index i is one of 0…n-1 (any index if n = 0).
-func latticeIndexOK(i float64, n int) bool {
-	return n == 0 || (i >= 0 && i < float64(n))
+// lattice1D: union of the 3 copies nearest to the point along a (a ≠ 0) for which ok(i).
+func (s Shape) lattice1D(ax, ay float64, ok func(i float64) bool) Shape {
+	a2 := ax*ax + ay*ay
+	return func(x, y, z float64) bool {
+		i0 := math.Round((x*ax + y*ay) / a2)
+		for i := i0 - 1; i <= i0+1; i++ {
+			if ok(i) && s(x-i*ax, y-i*ay, z) {
+				return true
+			}
+		}
+		return false
+	}
 }
 
 func fmod(a, b float64) float64 {

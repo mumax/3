@@ -166,3 +166,221 @@ func TestLatticeScript(t *testing.T) {
 		t.Fatal("lattice1d did not return a Shape")
 	}
 }
+
+// bruteSym is the reference for SymmetricLattice2D: explicit union over |i|, |j| ≤ N with keep(i, j).
+func bruteSym(s Shape, a1x, a1y, a2x, a2y float64, N int, keep func(i, j float64) bool) Shape {
+	return func(x, y, z float64) bool {
+		for i := -N; i <= N; i++ {
+			for j := -N; j <= N; j++ {
+				fi, fj := float64(i), float64(j)
+				if keep(fi, fj) && s(x-(fi*a1x+fj*a2x), y-(fi*a1y+fj*a2y), z) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+}
+
+var metrics = map[string]func(r float64) func(i, j float64) bool{
+	"chebyshev": func(r float64) func(i, j float64) bool {
+		return func(i, j float64) bool { return math.Max(math.Abs(i), math.Abs(j)) <= r }
+	},
+	"taxicab": func(r float64) func(i, j float64) bool {
+		return func(i, j float64) bool { return math.Abs(i)+math.Abs(j) <= r }
+	},
+	"euclidean": func(r float64) func(i, j float64) bool {
+		return func(i, j float64) bool { return math.Sqrt(i*i+j*j) <= r }
+	},
+}
+
+// Number of shapes: n = 1 is the shape, n = 2 gives 9 (chebyshev) / 5 (taxicab) / 5 (euclidean), ...
+func TestSymmetricLatticeCount(t *testing.T) {
+	const a = 100e-9
+	want := map[string]map[float64]int{
+		"chebyshev": {1: 1, 1.9: 1, 2: 9, 2.5: 9, 3: 25, 4: 49},
+		"taxicab":   {1: 1, 1.9: 1, 2: 5, 2.5: 5, 3: 13, 4: 25},
+		"euclidean": {1: 1, 1.9: 1, 2: 5, 2.5: 9, 3: 13, 3.3: 21, 4: 29},
+	}
+	for metric, cases := range want {
+		for n, count := range cases {
+			l := Circle(10e-9).SymmetricLattice2D(a, 0, 0, a, n, metric)
+			got := 0
+			for i := -6; i <= 6; i++ {
+				for j := -6; j <= 6; j++ {
+					if l(float64(i)*a, float64(j)*a, 0) {
+						got++
+						if !metrics[metric](n-1)(float64(i), float64(j)) {
+							t.Errorf("%s n=%g: unexpected copy (%d,%d)", metric, n, i, j)
+						}
+					}
+				}
+			}
+			if got != count {
+				t.Errorf("%s n=%g: %d shapes, want %d", metric, n, got, count)
+			}
+		}
+	}
+}
+
+// Equal to the explicit union, with overlapping copies, honeycomb and rotated vectors.
+func TestSymmetricLatticeUnion(t *testing.T) {
+	vecs := [][4]float64{{hx1, hy1, hx2, hy2}, {80e-9, 35e-9, -30e-9, 90e-9}}
+	for metric, keep := range metrics {
+		for _, v := range vecs {
+			for _, s := range []Shape{basis, big} {
+				for _, n := range []float64{2, 3, 3.7, 5} {
+					got := s.SymmetricLattice2D(v[0], v[1], v[2], v[3], n, metric)
+					compare(t, metric, got, bruteSym(s, v[0], v[1], v[2], v[3], 6, keep(n-1)), 600e-9, 50000)
+				}
+			}
+		}
+	}
+}
+
+func TestSymmetricLatticeSpecial(t *testing.T) {
+	s := basis
+	same := func(name string, a, b Shape) { compare(t, name, a, b, 600e-9, 30000) }
+	for metric := range metrics {
+		// fractional n is floor(n) for chebyshev and taxicab
+		if metric != "euclidean" {
+			same("floor", s.SymmetricLattice2D(hx1, hy1, hx2, hy2, 3.9, metric), s.SymmetricLattice2D(hx1, hy1, hx2, hy2, 3, metric))
+		}
+		// infinite
+		inf := s.Lattice2D(hx1, hy1, hx2, hy2, 0, 0)
+		same("n=0", s.SymmetricLattice2D(hx1, hy1, hx2, hy2, 0, metric), inf)
+		same("n=inf", s.SymmetricLattice2D(hx1, hy1, hx2, hy2, math.Inf(1), metric), inf)
+		// zero vector: symmetric chain with 2n-1 copies, the same for every metric
+		chain := s.Lattice1D(hx2, hy2, 5).Transl(-2*hx2, -2*hy2, 0)
+		same("a1=0", s.SymmetricLattice2D(0, 0, hx2, hy2, 3, metric), chain)
+		same("a2=0", s.SymmetricLattice2D(hx2, hy2, 0, 0, 3.5, metric), chain)
+		same("a1=a2=0", s.SymmetricLattice2D(0, 0, 0, 0, 4, metric), s)
+		// one layer: the shape itself, even for parallel vectors
+		same("n=1", s.SymmetricLattice2D(1e-9, 2e-9, 2e-9, 4e-9, 1, metric), s)
+	}
+	same("hexagonal a2=0", s.SymmetricLattice2D(hx2, hy2, 0, 0, 3, "hexagonal"), s.Lattice1D(hx2, hy2, 5).Transl(-2*hx2, -2*hy2, 0))
+	same("case-insensitive", s.SymmetricLattice2D(hx1, hy1, hx2, hy2, 3, "TaxiCab"), s.SymmetricLattice2D(hx1, hy1, hx2, hy2, 3, "taxicab"))
+}
+
+func TestSymmetricLatticeInvalid(t *testing.T) {
+	for name, f := range map[string]func(){
+		"n=0.5":    func() { Circle(1).SymmetricLattice2D(1, 0, 0, 1, 0.5, "taxicab") },
+		"n<0":      func() { Circle(1).SymmetricLattice2D(1, 0, 0, 1, -2, "taxicab") },
+		"n=NaN":    func() { Circle(1).SymmetricLattice2D(1, 0, 0, 1, math.NaN(), "taxicab") },
+		"metric":   func() { Circle(1).SymmetricLattice2D(1, 0, 0, 1, 2, "manhattan") },
+		"parallel": func() { Circle(1).SymmetricLattice2D(1, 2, -2, -4, 2, "euclidean") },
+		"vec Inf":  func() { Circle(1).SymmetricLattice2D(math.Inf(1), 0, 0, 1, 2, "euclidean") },
+	} {
+		func() {
+			defer func() {
+				if recover() == nil {
+					t.Errorf("%s: no error", name)
+				}
+			}()
+			f()
+		}()
+	}
+}
+
+func TestSymmetricLatticeScript(t *testing.T) {
+	for _, src := range []string{
+		`circle(10e-9).symmetricLattice2D(100e-9, 0, 50e-9, sqrt(3)/2*100e-9, 2.5, "euclidean")`,
+		`circle(10e-9).SymmetricLattice2D(100e-9, 0, 50e-9, sqrt(3)/2*100e-9, 3, "Chebyshev")`,
+		`circle(10e-9).SymmetricLattice2D(100e-9, 0, 50e-9, sqrt(3)/2*100e-9, 4, "hexagonal")`,
+	} {
+		if _, ok := World.MustEval(src).(Shape); !ok {
+			t.Fatalf("%s did not return a Shape", src)
+		}
+	}
+}
+
+// hexDist: lattice distance of each site (i, j) as the number of nearest-neighbour steps,
+// found by breadth-first search over the shortest real-space lattice vectors (independent
+// of the cube-coordinate formula in the code).
+func hexDist(a1x, a1y, a2x, a2y float64, maxd int) map[[2]int]int {
+	length := func(i, j int) float64 {
+		return math.Hypot(float64(i)*a1x+float64(j)*a2x, float64(i)*a1y+float64(j)*a2y)
+	}
+	var nb [][2]int
+	min := math.Inf(1)
+	for i := -2; i <= 2; i++ {
+		for j := -2; j <= 2; j++ {
+			if (i != 0 || j != 0) && length(i, j) < min {
+				min = length(i, j)
+			}
+		}
+	}
+	for i := -2; i <= 2; i++ {
+		for j := -2; j <= 2; j++ {
+			if (i != 0 || j != 0) && length(i, j) < min*(1+1e-9) {
+				nb = append(nb, [2]int{i, j})
+			}
+		}
+	}
+	dist := map[[2]int]int{{0, 0}: 0}
+	front := [][2]int{{0, 0}}
+	for d := 1; d <= maxd; d++ {
+		var next [][2]int
+		for _, p := range front {
+			for _, o := range nb {
+				q := [2]int{p[0] + o[0], p[1] + o[1]}
+				if _, seen := dist[q]; !seen {
+					dist[q] = d
+					next = append(next, q)
+				}
+			}
+		}
+		front = next
+	}
+	return dist
+}
+
+// Hexagonal metric on a hexagonal lattice: hexagonal numbers of shapes, a perfect hexagon
+// (invariant under 60° rotation), the same set for the 60° and the 120° choice of a2.
+func TestSymmetricLatticeHexagonal(t *testing.T) {
+	const a = 100e-9
+	a2_60 := [2]float64{a / 2, math.Sqrt(3) / 2 * a}
+	a2_120 := [2]float64{-a / 2, math.Sqrt(3) / 2 * a}
+	sites := func(l Shape) map[[2]int]bool { // sites by integer index in the 60° basis
+		m := map[[2]int]bool{}
+		for i := -8; i <= 8; i++ {
+			for j := -8; j <= 8; j++ {
+				if l(float64(i)*a+float64(j)*a2_60[0], float64(j)*a2_60[1], 0) {
+					m[[2]int{i, j}] = true
+				}
+			}
+		}
+		return m
+	}
+	for n, count := range map[float64]int{1: 1, 2: 7, 2.9: 7, 3: 19, 4: 37, 5: 61} {
+		l60 := Circle(10e-9).SymmetricLattice2D(a, 0, a2_60[0], a2_60[1], n, "hexagonal")
+		l120 := Circle(10e-9).SymmetricLattice2D(a, 0, a2_120[0], a2_120[1], n, "Hexagonal")
+		s60, s120 := sites(l60), sites(l120)
+		if len(s60) != count || len(s120) != count {
+			t.Errorf("n=%g: %d (60°) and %d (120°) shapes, want %d", n, len(s60), len(s120), count)
+		}
+		for p := range s60 {
+			if !s120[p] {
+				t.Errorf("n=%g: site %v only with the 60° basis", n, p)
+			}
+			// rotation by 60° in the 60° basis: (i, j) -> (-j, i+j)
+			if !s60[[2]int{-p[1], p[0] + p[1]}] {
+				t.Errorf("n=%g: not 60°-symmetric at %v", n, p)
+			}
+		}
+	}
+	// union with overlapping shapes vs brute force, honeycomb vectors (60°) and their 120° form
+	for _, v := range [][4]float64{{hx1, hy1, hx2, hy2}, {hx1, hy1, hx2 - hx1, hy2 - hy1}} {
+		dist := hexDist(v[0], v[1], v[2], v[3], 10)
+		for _, s := range []Shape{basis, big} {
+			for _, n := range []float64{2, 3, 4.5} {
+				keep := func(i, j float64) bool {
+					d, ok := dist[[2]int{int(i), int(j)}]
+					return ok && float64(d) <= n-1
+				}
+				got := s.SymmetricLattice2D(v[0], v[1], v[2], v[3], n, "hexagonal")
+				compare(t, "hexagonal", got, bruteSym(s, v[0], v[1], v[2], v[3], 6, keep), 600e-9, 50000)
+			}
+		}
+	}
+}

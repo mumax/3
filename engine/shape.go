@@ -442,6 +442,78 @@ func (s Shape) Repeat(periodX, periodY, periodZ float64) Shape {
 	}
 }
 
+// Lattice2D returns copies of the shape at i·a1 + j·a2, with lattice vectors
+// a1 = (a1x, a1y) and a2 = (a2x, a2y) in meter and i = 0…n1-1, j = 0…n2-1.
+// n = 1 is the shape itself, n = 2 adds one copy displaced by the vector,
+// n = 0 repeats infinitely in both directions (i, j any integer).
+// Overlapping copies are merged (union). Each point is tested against the
+// 3×3 nearest copies only, so the result is exact as long as the shape lies
+// within ±1.5 lattice vectors of its origin (fractional coordinates |u|, |v| < 1.5);
+// parts further out are cut off, like with Repeat.
+// A zero vector (or n = 1) means no repetition in that direction.
+func (s Shape) Lattice2D(a1x, a1y, a2x, a2y float64, n1, n2 int) Shape {
+	util.AssertMsg(n1 >= 0 && n2 >= 0, "Lattice: number of copies must be ≥ 0 (0 = infinite)")
+	for _, a := range []float64{a1x, a1y, a2x, a2y} {
+		util.AssertMsg(!math.IsNaN(a) && !math.IsInf(a, 0), "Lattice: lattice vectors must be finite")
+	}
+	// A direction without repetition: zero vector (all copies coincide) or a single copy.
+	no1 := n1 == 1 || (a1x == 0 && a1y == 0)
+	no2 := n2 == 1 || (a2x == 0 && a2y == 0)
+	switch {
+	case no1 && no2:
+		return s
+	case no2:
+		return s.lattice1D(a1x, a1y, n1)
+	case no1:
+		return s.lattice1D(a2x, a2y, n2)
+	}
+	det := a1x*a2y - a1y*a2x
+	util.AssertMsg(math.Abs(det) > 1e-9*math.Hypot(a1x, a1y)*math.Hypot(a2x, a2y),
+		"Lattice2D: lattice vectors are parallel, use Lattice1D")
+	return func(x, y, z float64) bool {
+		// fractional coordinates of (x, y), rounded to the nearest lattice index
+		i0 := math.Round((a2y*x - a2x*y) / det)
+		j0 := math.Round((a1x*y - a1y*x) / det)
+		for i := i0 - 1; i <= i0+1; i++ {
+			if !latticeIndexOK(i, n1) {
+				continue
+			}
+			for j := j0 - 1; j <= j0+1; j++ {
+				if latticeIndexOK(j, n2) && s(x-i*a1x-j*a2x, y-i*a1y-j*a2y, z) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+}
+
+// Lattice1D returns copies of the shape at i·a, a = (ax, ay) in meter,
+// i = 0…n-1, or any integer i if n = 0 (infinite). Same as Lattice2D(ax, ay, 0, 0, n, 1).
+// Exact as long as the shape lies within ±1.5·a of its origin along a.
+func (s Shape) Lattice1D(ax, ay float64, n int) Shape {
+	return s.Lattice2D(ax, ay, 0, 0, n, 1)
+}
+
+// lattice1D: union of the 3 copies nearest to the point along a (a ≠ 0).
+func (s Shape) lattice1D(ax, ay float64, n int) Shape {
+	a2 := ax*ax + ay*ay
+	return func(x, y, z float64) bool {
+		i0 := math.Round((x*ax + y*ay) / a2)
+		for i := i0 - 1; i <= i0+1; i++ {
+			if latticeIndexOK(i, n) && s(x-i*ax, y-i*ay, z) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+// latticeIndexOK reports whether lattice index i is one of 0…n-1 (any index if n = 0).
+func latticeIndexOK(i float64, n int) bool {
+	return n == 0 || (i >= 0 && i < float64(n))
+}
+
 func fmod(a, b float64) float64 {
 	if b == 0 || math.IsInf(b, 1) {
 		return a

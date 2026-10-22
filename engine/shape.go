@@ -606,6 +606,36 @@ func (s Shape) RotX(θ float64) Shape {
 	}
 }
 
+// Imposes n-fold rotational symmetry around the Z-axis (through the origin).
+// If crop is false, the result is the union of the shape rotated over k*2π/n, k = 0..n-1
+// (same as s.Add(s.RotZ(2*pi/n)).Add(...)), so parts extending beyond their sector may overlap.
+// If crop is true, only the part of the shape inside sector 0 (angle between -π/n and π/n,
+// centered on the +x axis) is kept and repeated, analogous to Repeat().
+func (s Shape) RotSymZ(n int, crop bool) Shape {
+	util.Argument(n >= 1)
+	cos := make([]float64, n)
+	sin := make([]float64, n)
+	for k := range cos {
+		sin[k], cos[k] = math.Sincos(2 * math.Pi * float64(k) / float64(n))
+	}
+	if crop {
+		α := 2 * math.Pi / float64(n)
+		return func(x, y, z float64) bool {
+			k := int(math.Round(math.Atan2(y, x) / α)) // sector index in [-n/2, n/2]
+			k = (k%n + n) % n
+			return s(x*cos[k]+y*sin[k], -x*sin[k]+y*cos[k], z)
+		}
+	}
+	return func(x, y, z float64) bool {
+		for k := range cos {
+			if s(x*cos[k]+y*sin[k], -x*sin[k]+y*cos[k], z) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 // Union of shapes a and b (logical OR).
 func (a Shape) Add(b Shape) Shape {
 	return func(x, y, z float64) bool {

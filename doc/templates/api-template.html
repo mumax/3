@@ -1,14 +1,8 @@
 
 {{define "entry"}}
 	<div class="api-entry">
-	<p><span style="color:#000088; font-size:1.5em; font-family: monospace"> <b class="api-identifier">{{.Name}}</b>{{.Ins}} </span> 
+	<p><span style="color:#000088; font-size:1.5em; font-family: monospace"> <b class="api-identifier">{{.Name}}</b>{{.Sig}} </span> 
 	{{with .Doc}} <p style="margin-left:40px" class="api-docstring"> {{.}} </p> {{end}}
-
-	{{with .Methods}} 
-		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
-			{{range .}} {{.}} &nbsp;{{end}}
-		</span> </p> 
-	{{end}}
 
 	{{with .Examples}} <p style="margin-left:40px; color:grey"> examples: 
 		{{range .}} 
@@ -21,11 +15,31 @@
 	</div>
 {{end}}
 
+{{define "typehead"}}
+	<h2 class="api-type" id="{{.ID}}" style="font-family: monospace; color:#000088">type {{.Name}}</h2>
+{{end}}
+
+{{define "methods"}}
+	{{with .ImplementedBy}} <p style="color:grey"> implemented by: {{.}} </p> {{end}}
+	{{with .Implements}} <p style="color:grey"> implements: {{.}} </p> {{end}}
+	{{range .Methods}}
+	<div class="api-entry">
+	<p><span style="color:#000088; font-size:1.2em; font-family: monospace"> .<b class="api-identifier">{{.Name}}</b>{{.Sig}} </span>
+	{{with .Doc}} <p style="margin-left:40px" class="api-docstring"> {{.}} </p> {{end}}
+	</p>
+	</div>
+	{{end}}
+{{end}}
+
 <!DOCTYPE html>
 <html>
 {{.Include "head.html"}}
 
 <body>
+<style>
+	a.api-type-link { color: inherit; text-decoration: underline dotted; }
+	h2.api-type { margin-top: 2em; }
+</style>
 {{.Include "header.html"}}
 
 <div class="api-container">
@@ -38,28 +52,29 @@
 
   <h3>Basics</h3>
   <ul class="pure-menu-list">
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'syntax')" id="default-open">Syntax</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'mesh')">Mesh size and geometry</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'shapes')">Shapes</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'regions')">Material regions</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'initial')">Initial magnetization</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'parameters')">Material parameters</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'excitation')">Excitation</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'outputquantities')">Output quantities</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'output')">Scheduling output</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'running')">Running</a></li>
+    <li class="pure-menu-item"><a href="#syntax" class="pure-menu-link api-section-link" onclick="openType(event, 'syntax')" id="default-open">Syntax</a></li>
+    <li class="pure-menu-item"><a href="#types" class="pure-menu-link api-section-link" onclick="openType(event, 'types')">Data types</a></li>
+    <li class="pure-menu-item"><a href="#mesh" class="pure-menu-link api-section-link" onclick="openType(event, 'mesh')">Mesh size and geometry</a></li>
+    <li class="pure-menu-item"><a href="#shapes" class="pure-menu-link api-section-link" onclick="openType(event, 'shapes')">Shapes</a></li>
+    <li class="pure-menu-item"><a href="#regions" class="pure-menu-link api-section-link" onclick="openType(event, 'regions')">Material regions</a></li>
+    <li class="pure-menu-item"><a href="#initial" class="pure-menu-link api-section-link" onclick="openType(event, 'initial')">Initial magnetization</a></li>
+    <li class="pure-menu-item"><a href="#parameters" class="pure-menu-link api-section-link" onclick="openType(event, 'parameters')">Material parameters</a></li>
+    <li class="pure-menu-item"><a href="#excitation" class="pure-menu-link api-section-link" onclick="openType(event, 'excitation')">Excitation</a></li>
+    <li class="pure-menu-item"><a href="#outputquantities" class="pure-menu-link api-section-link" onclick="openType(event, 'outputquantities')">Output quantities</a></li>
+    <li class="pure-menu-item"><a href="#output" class="pure-menu-link api-section-link" onclick="openType(event, 'output')">Scheduling output</a></li>
+    <li class="pure-menu-item"><a href="#running" class="pure-menu-link api-section-link" onclick="openType(event, 'running')">Running</a></li>
   </ul>
   <h3>Advanced Features</h3>
   <ul class="pure-menu-list">
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'currents')">Spin currents</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'mfm')">Magnetic Force Microscopy</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'slicing')">Slicing and dicing output</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'movingwindow')">Moving window</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'extensions')">Extensions</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'customquantities')">Custom quantities</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'customfields')">Custom effective field terms</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'math')">Math</a></li>
-    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'misc')">Misc</a></li>
+    <li class="pure-menu-item"><a href="#currents" class="pure-menu-link api-section-link" onclick="openType(event, 'currents')">Spin currents</a></li>
+    <li class="pure-menu-item"><a href="#mfm" class="pure-menu-link api-section-link" onclick="openType(event, 'mfm')">Magnetic Force Microscopy</a></li>
+    <li class="pure-menu-item"><a href="#slicing" class="pure-menu-link api-section-link" onclick="openType(event, 'slicing')">Slicing and dicing output</a></li>
+    <li class="pure-menu-item"><a href="#movingwindow" class="pure-menu-link api-section-link" onclick="openType(event, 'movingwindow')">Moving window</a></li>
+    <li class="pure-menu-item"><a href="#extensions" class="pure-menu-link api-section-link" onclick="openType(event, 'extensions')">Extensions</a></li>
+    <li class="pure-menu-item"><a href="#customquantities" class="pure-menu-link api-section-link" onclick="openType(event, 'customquantities')">Custom quantities</a></li>
+    <li class="pure-menu-item"><a href="#customfields" class="pure-menu-link api-section-link" onclick="openType(event, 'customfields')">Custom effective field terms</a></li>
+    <li class="pure-menu-item"><a href="#math" class="pure-menu-link api-section-link" onclick="openType(event, 'math')">Math</a></li>
+    <li class="pure-menu-item"><a href="#misc" class="pure-menu-link api-section-link" onclick="openType(event, 'misc')">Misc</a></li>
   </ul>
 
   <p class="oldlink" style="margin-top: 4em"><a href="api3111.html"> Go to mumax3.11.1 API</a></p>
@@ -129,7 +144,9 @@ Msat = value        // time-independent Msat
 	Some of the API instances have methods defined on them. You can call methods on an instance by using '<code>.</code>' as in most object oriented programming languages. 
 	E.g.: a material parameter such as <code>Msat</code> has the method <code>SetRegion(<i>int</i>, <i>float</i>)</code> to set the value of the material parameter in a certain region:
 
-	<pre><code>Msat.SetRegion(1, 800e3) // Set Msat=520e3 in region 1 </code></pre>
+	<pre><code>Msat.SetRegion(1, 800e3) // Set Msat=800e3 in region 1 </code></pre>
+
+	Which methods are available depends on the <a href="#types" onclick="openType(event, 'types')">data type</a> of the instance. The type of each variable, function argument and return value is shown in the API; click on it to see its methods.
 
 </div>
 
@@ -165,7 +182,7 @@ SetCellSize(5e-9, 5e-9, 5e-9)
 
 	<h2> Setting the geometry </h2>
 
-	Optionally a magnet <code>Shape</code> other than the full simulation box can be specified. In order to set the geometry, you first need to <a href="#" onclick="openSection(event, 'geometry')">define a shape</a>.
+	Optionally a magnet <code>Shape</code> other than the full simulation box can be specified. In order to set the geometry, you first need to <a href="#shapes" onclick="openType(event, 'shapes')">define a shape</a>.
 <pre><code>geometryShape := cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0)
 SetGeom(geometryShape)
 </code></pre>
@@ -193,6 +210,10 @@ anotherShape := Circle(400e-9).sub(Circle(200e-9))
 	<hr/>
 
 	{{range .FilterReturn "Shape"}} {{template "entry" .}} {{end}}
+
+	<hr/>
+
+	<p>All functions above return a <a href="#type-Shape" onclick="openType(event, 'type-Shape')">Shape</a>. See its methods for transforming and combining shapes.</p>
 
 </div>
 
@@ -599,6 +620,144 @@ tableAdd(E_custom)  // Add a column with the energy related to the custom field
 
 
 
+<div id="types" class="api-section" >
+
+	<h1> Data types </h1>
+
+	<p>Every variable, function argument and return value in mumax<sup>3</sup> has a fixed data type. Besides the usual
+	numbers (<code>float64</code>, <code>int</code>), <code>bool</code> and <code>string</code>, the API uses the data types listed below.
+	The type is shown next to each API entry, e.g.: <code><b>Msat</b> RegionwiseScalar</code> is a variable of type <code>RegionwiseScalar</code>
+	and <code><b>Circle</b>(diam float64) Shape</code> is a function returning a <code>Shape</code>. Click on a type to jump to its description.</p>
+
+	<p>The methods of a type are called with '<code>.</code>' and can be chained, e.g.:</p>
+<pre><code>m.Comp(0).Region(1).Average()   // magnetization → x-component → in region 1 → average
+</code></pre>
+
+	<hr/>
+
+	{{template "typehead" .Type "Quantity"}}
+	<p>A <code>Quantity</code> is anything that can be evaluated on the simulation mesh: the magnetization, effective fields, energy densities, material parameters, excitations, and quantities derived from them (cropped, region-restricted, custom quantities). Every <code>Quantity</code> can be passed to output functions such as <code>Save</code>, <code>AutoSave</code> and <code>TableAdd</code>, and to the functions for <a href="#slicing" onclick="openType(event, 'slicing')">slicing</a> and <a href="#customquantities" onclick="openType(event, 'customquantities')">custom quantities</a>.</p>
+<pre><code>save(B_demag)
+tableAdd(CropLayer(m, 0))
+</code></pre>
+	{{template "methods" .Type "Quantity"}}
+
+	{{template "typehead" .Type "ScalarField"}}
+	<p>A space-dependent output quantity with one component, e.g. an energy density such as <code>Edens_exch</code>, or a single component of a <code>VectorField</code>.</p>
+	{{template "methods" .Type "ScalarField"}}
+
+	{{template "typehead" .Type "VectorField"}}
+	<p>A space-dependent output quantity with three components, e.g. an effective field such as <code>B_demag</code> or <code>B_eff</code>.</p>
+<pre><code>B_eff.Comp(2).Average()   // average z-component of the effective field
+</code></pre>
+	{{template "methods" .Type "VectorField"}}
+
+	{{template "typehead" .Type "ScalarValue"}}
+	<p>A space-independent scalar output quantity, e.g. a total energy such as <code>E_total</code>.</p>
+	{{template "methods" .Type "ScalarValue"}}
+
+	{{template "typehead" .Type "VectorValue"}}
+	<p>A space-independent vector output quantity, e.g. <code>ext_corepos</code>.</p>
+	{{template "methods" .Type "VectorValue"}}
+
+	{{template "typehead" .Type "magnetization"}}
+	<p>The type of the reduced magnetization <code>m</code>. It is always normalized and zero outside the geometry. It can be set with a <code>Config</code> (globally, per region or inside a <code>Shape</code>), or loaded from a file. See <a href="#initial" onclick="openType(event, 'initial')">Initial magnetization</a>.</p>
+<pre><code>m = uniform(1, 0, 0)
+m.SetInShape(circle(50e-9), vortex(1, 1))
+</code></pre>
+	{{template "methods" .Type "magnetization"}}
+
+	{{template "typehead" .Type "Config"}}
+	<p>A magnetization configuration, i.e. a magnetization direction as a function of position. It is returned by functions such as <code>Uniform</code>, <code>Vortex</code> and <code>RandomMag</code> and assigned to <code>m</code>. Like shapes, configurations can be transformed and combined:</p>
+<pre><code>m = vortex(1, 1).Transl(100e-9, 0, 0)
+m = uniform(1, 0, 0).Add(0.1, randomMag())
+</code></pre>
+	{{template "methods" .Type "Config"}}
+
+	{{template "typehead" .Type "RegionwiseScalar"}}
+	<p>A scalar material parameter, e.g. <code>Msat</code>, <code>Aex</code>, <code>alpha</code> or <code>Temp</code>. It has one value per region, which may be time-dependent. Assignment with <code>=</code> sets the value in all regions. See <a href="#parameters" onclick="openType(event, 'parameters')">Material parameters</a>.</p>
+<pre><code>Msat = 800e3
+Msat.SetRegion(1, 540e3)
+</code></pre>
+	{{template "methods" .Type "RegionwiseScalar"}}
+
+	{{template "typehead" .Type "RegionwiseVector"}}
+	<p>A vector material parameter, e.g. the anisotropy axis <code>AnisU</code>. Like <code>RegionwiseScalar</code> but with three components.</p>
+<pre><code>AnisU = vector(1, 0, 0)
+AnisU.SetRegion(1, vector(0, 0, 1))
+</code></pre>
+	{{template "methods" .Type "RegionwiseVector"}}
+
+	{{template "typehead" .Type "Excitation"}}
+	<p>A vector excitation, e.g. the external field <code>B_ext</code> or the current density <code>J</code>. Like a <code>RegionwiseVector</code>, it is set per region, but extra space- and time-dependent terms <code>mask(x,y,z) * f(t)</code> can be added. See <a href="#excitation" onclick="openType(event, 'excitation')">Excitation</a>.</p>
+<pre><code>B_ext = vector(0, 0, 0.01)
+B_ext.Add(LoadFile("antenna.ovf"), sin(2*pi*1e9*t))
+</code></pre>
+	{{template "methods" .Type "Excitation"}}
+
+	{{template "typehead" .Type "ScalarExcitation"}}
+	<p>A scalar excitation, e.g. the strain components <code>exx</code>, <code>exy</code>, ... Like <code>Excitation</code>, but with one component.</p>
+	{{template "methods" .Type "ScalarExcitation"}}
+
+	{{template "typehead" .Type "Shape"}}
+	<p>A geometrical shape, returned by the functions on the <a href="#shapes" onclick="openType(event, 'shapes')">Shapes</a> page and used by e.g. <code>SetGeom</code>, <code>DefRegion</code> and <code>m.SetInShape</code>. Shapes are immutable: the methods below do not modify the shape, but return a new, transformed shape. Hence, they can be chained:</p>
+<pre><code>ring := circle(400e-9).sub(circle(200e-9))
+ring2 := ring.transl(1e-6, 0, 0).add(ring.transl(-1e-6, 0, 0))
+</code></pre>
+	<p>Rotation angles are in radians, distances in meters.</p>
+	{{template "methods" .Type "Shape"}}
+
+	{{template "typehead" .Type "Regions"}}
+	<p>The type of <code>regions</code>, which stores the material region index (0-255) of each cell. See <a href="#regions" onclick="openType(event, 'regions')">Material regions</a>.</p>
+	{{template "methods" .Type "Regions"}}
+
+	{{template "typehead" .Type "Vector"}}
+	<p>A vector with three components, constructed with <code>vector(x, y, z)</code>, and returned e.g. by the <code>Average()</code> of vector quantities.</p>
+<pre><code>avg := m.Average()
+print(avg.X(), avg.Len())
+</code></pre>
+	{{template "methods" .Type "Vector"}}
+
+	{{template "typehead" .Type "Slice"}}
+	<p>Raw space-dependent data with one or more components, e.g. loaded from an <code>.ovf</code> file with <code>LoadFile</code> or created with <code>NewVectorMask</code>. Slices are used as masks for <code>Excitation.Add</code>, and can be edited cell by cell.</p>
+<pre><code>mask := NewVectorMask(Nx, Ny, Nz)
+mask.SetVector(0, 0, 0, vector(1, 0, 0))
+B_ext.Add(mask, sin(2*pi*1e9*t))
+</code></pre>
+	{{template "methods" .Type "Slice"}}
+
+	{{template "typehead" .Type "ScalarFunction"}}
+	<p>An argument of this type accepts any scalar expression. It is converted to a function which is re-evaluated every time it is needed (see <a href="#syntax" onclick="openType(event, 'syntax')">Implicit functions</a>), so it may depend on time <code>t</code>.</p>
+<pre><code>Msat.SetRegion(1, 800e3*(1 + 0.1*sin(2*pi*1e9*t)))
+</code></pre>
+	{{template "methods" .Type "ScalarFunction"}}
+
+	{{template "typehead" .Type "VectorFunction"}}
+	<p>Like <code>ScalarFunction</code>, but for a vector expression, e.g. <code>vector(0, 0, 0.1*sin(2*pi*1e9*t))</code>.</p>
+	{{template "methods" .Type "VectorFunction"}}
+
+	{{template "typehead" .Type "OutputFormat"}}
+	<p>Output file format: one of the constants <code>OVF1_TEXT</code>, <code>OVF1_BINARY</code>, <code>OVF2_TEXT</code>, <code>OVF2_BINARY</code> or <code>DUMP</code>, assigned to <code>OutputFormat</code>.</p>
+
+	{{template "typehead" .Type "FixedLayerPosition"}}
+	<p>Position of the fixed layer in the Slonczewski model: <code>FIXEDLAYER_TOP</code> or <code>FIXEDLAYER_BOTTOM</code>, assigned to <code>FixedLayerPosition</code>.</p>
+
+	<hr/>
+
+	<h2>Other types</h2>
+	<p>Internal types returned by some functions and methods. They are all <code>Quantity</code>s.</p>
+
+	{{range .RemainingTypes}}
+		{{template "typehead" .}}
+		{{with .Doc}} <p> {{.}} </p> {{end}}
+		{{template "methods" .}}
+	{{end}}
+
+</div>
+
+
+
+
 <div id="math" class="api-section" >
 
 	<h1> Math </h1>
@@ -669,10 +828,36 @@ tableAdd(E_custom)  // Add a column with the energy related to the custom field
 	  document.getElementById(sectionName).style.display = "block";
 	}
 
+	// open the section containing element id (e.g. a data type), the
+	// browser then scrolls to it via the link's #id.
+	function openType(evt, id) {
+		var el = document.getElementById(id);
+		if (!el || (evt && (evt.ctrlKey || evt.metaKey || evt.shiftKey))) { return; } // new tab/window: let the browser handle it
+		if (evt) { // remember where we came from, for the browser's back button
+			var cur = [...document.getElementsByClassName("api-section")].find(s => s.style.display == "block");
+			history.replaceState({section: cur && cur.id, y: window.scrollY}, "");
+		}
+		openSection(evt, el.closest(".api-section").id);
+		if (el.classList.contains("api-section")) { // a whole section: show it from the top of the page
+			if (evt) { evt.preventDefault(); history.pushState(null, "", "#" + id); }
+			window.scrollTo(0, 0);
+		} else if (!evt) { // deep link or Forward: no link click to scroll for us
+			el.scrollIntoView();
+		}
+	}
+
+	history.scrollRestoration = "manual"; // scroll position is restored by popstate below
+	window.addEventListener("popstate", function(e) {
+		if (e.state && e.state.section) { openSection(null, e.state.section); window.scrollTo(0, e.state.y); }
+		else if (location.hash) { openType(null, location.hash.substring(1)); }
+	});
+
 	window.onload = function() {
 		document.getElementById("searchInput").value = "";
 		document.getElementById("searchInput").click();
 		document.getElementById("searchInput").focus();
+		var el = location.hash && document.getElementById(location.hash.substring(1));
+		if (el) { openType(null, el.id); }
 	}
 
 	document.addEventListener("DOMContentLoaded", () => {

@@ -16,6 +16,7 @@ import (
 var flag_vet = flag.Bool("vet", false, "only vet source files, don't run them")
 var flag_examples = flag.Bool("examples", false, "run mumax3 examples")
 var flag_forced = flag.Bool("forced", false, "force to re-run mumax3 examples")
+var flag_noexec = flag.Bool("noexec", false, "render examples without running them or including their output (fast, no GPU needed)")
 var flag_builddir = flag.String("builddir", "build", "build directory")
 
 var buildDir string
@@ -104,7 +105,7 @@ func (s *State) Example(in string) string {
 		arg = "-vet"
 	}
 
-	if _, err := os.Stat(s.outfile()); os.IsNotExist(err) || *flag_forced {
+	if _, err := os.Stat(s.outfile()); !*flag_noexec && (os.IsNotExist(err) || *flag_forced) {
 		cmd("mumax3", "-cache", "/tmp", arg, s.infile())
 	}
 
@@ -141,6 +142,9 @@ func (s *State) Include(fname string) string {
 }
 
 func (s *State) Output() string {
+	if *flag_noexec {
+		return ""
+	}
 	out := `<h3>output</h3> `
 
 	dir, err := os.Open(s.outfile())
@@ -183,6 +187,9 @@ func (s *State) Output() string {
 // hysteresis example. State.OutputHysteresis is the custom output function
 // for the hysteresis example.
 func (s *State) OutputHysteresis() string {
+	if *flag_noexec {
+		return ""
+	}
 	tableName := path.Join(s.outfile(), "table.txt")
 	figureName := path.Join(s.outfile(), "hysteresis.svg")
 	relFigureName := path.Join(s.relativeOutfile(), "hysteresis.svg")

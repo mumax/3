@@ -28,7 +28,9 @@ type entry struct {
 }
 
 func buildAPI() {
-	cuda.Init(0) // gpu 0
+	if !*flag_noexec {
+		cuda.Init(0) // gpu 0
+	}
 
 	ident := engine.World.Identifiers
 	doc := engine.World.Doc

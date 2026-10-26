@@ -2,6 +2,7 @@ package mag
 
 import (
 	"bufio"
+	"crypto/sha256"
 	"fmt"
 	"math"
 	"os"
@@ -37,7 +38,12 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	}()
 
 	// Try to load kernel
-	basename := fmt.Sprint(cacheDir, "/", "mumax3kernel_", inputSize, "_", pbc, "_", cellsize, "_", accuracy, "_")
+	// Kernel filenames have a hash based on strtohash, to avoid too long filenames
+	strtohash := fmt.Sprint(pbc, "_", cellsize, "_", accuracy)
+	hash := sha256.New()
+	hash.Write([]byte(strtohash))
+	hashstr := string([]rune(fmt.Sprintf("%x\n", hash.Sum(nil)))[:8]) // First 8 chars of hash should be unique enough
+	basename := fmt.Sprint(cacheDir, "/", "mumax3kernel_", inputSize, "_", hashstr, " ")
 	var errLoad error
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {

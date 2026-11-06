@@ -115,3 +115,36 @@ func reinitstrayconv() {
 	kernel := mag.StrayKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy, strayconvoffset, *Flag_cachedir)
 	strayconv_ = cuda.NewStray(Mesh().Size(), Mesh().PBC(), kernel)
 }
+
+// Flatten the stray field by following the top of the geometry.
+// If a Z-column contains no geometry, the bottommost cell is used.
+// Example: GetStrayField(0,0,dz).AtTopSurface() obtains the field at dz above the surface.
+func (sf *strayField) AtTopSurface() *strayField {
+	nComp := sf.NComp()
+	util.Assert(nComp == 1 || nComp == 3)
+	size := sf.Mesh().Size()
+	util.Assert(size[Z] == Mesh().Size()[Z]) // Can only select top if sf has same height as global mesh
+	newSize := [3]int{size[X], size[Y], 1}
+
+	gpu := cuda.Buffer(nComp, size)
+	defer cuda.Recycle(gpu)
+	data.Copy(gpu, sf.slice)
+
+	dst := cuda.Buffer(nComp, newSize)
+	defer cuda.Recycle(dst)
+	msat := Msat.MSlice()
+	defer msat.Recycle()
+
+	switch nComp {
+	case 3:
+		cuda.AtTopVector(dst, gpu, sf.offset, msat, sf.Mesh(), geometry.Gpu())
+	case 1:
+		cuda.AtTopScalar(dst, gpu, sf.offset, msat, sf.Mesh(), geometry.Gpu())
+	default:
+		util.Fatal("AtTop() expects a scalar or 3D vector input.")
+	}
+
+	host := data.NewSlice(nComp, newSize)
+	data.Copy(host, dst)
+	return NewStrayField(host, newSize, sf.offset)
+}

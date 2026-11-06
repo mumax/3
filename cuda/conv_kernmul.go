@@ -43,3 +43,13 @@ func kernMulC_async(fftM, K *data.Slice, Nx, Ny int) {
 	cfg := make3DConf([3]int{Nx, Ny, 1})
 	k_kernmulC_async(fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg)
 }
+
+// kernel multiplication for 3D demag convolution. Does not assume any spatial symmetry.
+func kernMulC3D_async(fftM [3]*data.Slice, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy *data.Slice, Nx, Ny, Nz int) {
+	util.Argument(fftM[X].NComp() == 1 && Kxx.NComp() == 1)
+
+	cfg := make3DConf([3]int{Nx, Ny, Nz})
+	k_kernmulC3D_async(fftM[X].DevPtr(0), fftM[Y].DevPtr(0), fftM[Z].DevPtr(0),
+		Kxx.DevPtr(0), Kyy.DevPtr(0), Kzz.DevPtr(0), Kyz.DevPtr(0), Kxz.DevPtr(0), Kxy.DevPtr(0),
+		Nx, Ny, Nz, cfg)
+}

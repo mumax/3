@@ -105,13 +105,20 @@ func LoadKernel(fname string) (kernel *data.Slice, err error) {
 	return
 }
 
-func SaveKernel(fname string, kernel *data.Slice, info data.Meta) error {
+func SaveKernel(fname string, kernel *data.Slice, info data.Meta) (err error) {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
 	out := bufio.NewWriter(f)
-	defer out.Flush()
+	defer func() {
+		if flushErr := out.Flush(); err == nil {
+			err = flushErr
+		}
+		if closeErr := f.Close(); err == nil {
+			err = closeErr
+		}
+	}()
 	oommf.WriteOVF2(out, kernel, info, "binary 4")
 	return nil
 }

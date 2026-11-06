@@ -48,9 +48,6 @@ func StrayKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, o
 	var errLoad error
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {
-				continue // element not needed in 2D
-			}
 			kernel[i][j], errLoad = LoadKernel(fmt.Sprint(basename, i, j, ".ovf"))
 			if errLoad != nil {
 				break
@@ -77,9 +74,6 @@ func StrayKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, o
 	kernel = CalcStrayKernel(inputSize, pbc, cellsize, accuracy, offset)
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {
-				continue // element not needed in 2D
-			}
 			compName := fmt.Sprint("N_", i, j)
 
 			info := data.Meta{Time: float64(0.0), Name: compName, Unit: "1", CellSize: cellsize, MeshUnit: "m"}

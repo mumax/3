@@ -113,10 +113,14 @@ func CalcStrayKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 		util.Assert(accuracy > 0)
 	}
 
+	r1, r2 := kernelRanges(size, pbc) // Field (destination) loop ranges
 	// Wrap offset based on PBC (effectively makes PBC > 0 extend infinitely far)
 	for c := range 3 {
 		if pbc[c] > 0 {
 			offset[c] = math.Remainder(offset[c], float64(size[c])*cellsize[c])
+			shift := int(math.Round(offset[c] / cellsize[c]))
+			r1[c] -= shift
+			r2[c] -= shift
 		}
 	}
 
@@ -128,9 +132,6 @@ func CalcStrayKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 			array[i][j] = kernel[i][j].Scalars()
 		}
 	}
-
-	// Field (destination) loop ranges
-	r1, r2 := kernelRanges(size, pbc)
 
 	// smallest cell dimension is our typical length scale
 	L := cellsize[X]
@@ -177,9 +178,15 @@ func CalcStrayKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 						R[X] = float64(x)*cellsize[X] + offset[X]
 
 						// choose number of integration points depending on how far we are from source.
-						dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
+						// Does not use delta() like demagKernel due to need to account for offset.
+						dx := math.Max(math.Abs(float64(x)*cellsize[X]+offset[X])-cellsize[X], 0)
+						dy := math.Max(math.Abs(float64(y)*cellsize[Y]+offset[Y])-cellsize[Y], 0)
+						dz := math.Max(math.Abs(float64(z)*cellsize[Z]+offset[Z])-cellsize[Z], 0)
 						d := math.Sqrt(dx*dx + dy*dy + dz*dz)
-						if d == 0 {
+						// Not using delta() can cause d to become tiny, which would
+						// lead to a massive number of iterations in the following loops.
+						// Therefore, take d >= L (similar to purpose of delta() in demagKernel)
+						if d < L {
 							d = L
 						}
 						maxSize := d / accuracy // maximum acceptable integration size

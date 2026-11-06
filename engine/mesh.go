@@ -80,6 +80,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 		// free everything to trigger kernel recalculation, etc
 		conv_.Free()
 		conv_ = nil
+		strayconv_.Free()
+		strayconv_ = nil
 		mfmconv_.Free()
 		mfmconv_ = nil
 		cuda.FreeBuffers()

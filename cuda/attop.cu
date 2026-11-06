@@ -20,8 +20,8 @@ attop(float* __restrict__ topx, float* __restrict__ topy, float* __restrict__ to
     }
 
     // Snap to global mesh cell center
-    int ixglobal = ix + int(offsetx/cx + 0.5f);
-    int iyglobal = iy + int(offsety/cy + 0.5f);
+    int ixglobal = ix + __float2int_rd(offsetx/cx + 0.5f);
+    int iyglobal = iy + __float2int_rd(offsety/cy + 0.5f);
     ixglobal = PBCx? MOD(ixglobal, Nx) : ixglobal; // TODO: use finite PBC amount
     iyglobal = PBCy? MOD(iyglobal, Ny) : iyglobal;
 

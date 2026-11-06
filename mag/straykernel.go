@@ -113,6 +113,13 @@ func CalcStrayKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 		util.Assert(accuracy > 0)
 	}
 
+	// Wrap offset based on PBC (effectively makes PBC > 0 extend infinitely far)
+	for c := range 3 {
+		if pbc[c] > 0 {
+			offset[c] = math.Remainder(offset[c], float64(size[c])*cellsize[c])
+		}
+	}
+
 	// Allocate only upper diagonal part. The rest is symmetric due to reciprocity.
 	var array [3][3][][][]float32
 	for i := range 3 {

@@ -1,0 +1,53 @@
+// Stray-field regressions to check agreement with B_demag at zero offset,
+// test finite/open boundaries, periodic offsets, and non-cubic grids.
+Msat = 800e3
+c := 5e-9
+
+//// A non-cubic 3D open-boundary mesh
+SetMesh(3, 4, 3, c, 1.1*c, 0.85*c, 0, 0, 0)
+m = Uniform(0.3, -0.4, 0.8)
+
+// At zero offset, the stray field must match the ordinary demag field.
+sfOBC3D := GetStrayField(0, 0, 0)
+diffOBC3D := Madd(sfOBC3D, B_demag, 1, -1)
+errOBC3D := Sum(Dot(diffOBC3D, diffOBC3D)) / Sum(Dot(B_demag, B_demag))
+Expect("3D OBC zero-offset stray field matches demag", errOBC3D, 0, 1e-5)
+
+// A one-cell offset must not wrap on open axes.
+sfShiftOBC3D := GetStrayField(c, 0, 0)
+diffShiftOBC3D := Madd(sfShiftOBC3D, sfOBC3D, 1, -1)
+errShiftOBC3D := Sum(Dot(diffShiftOBC3D, diffShiftOBC3D)) / Sum(Dot(sfOBC3D, sfOBC3D))
+ExpectB("3D OBC offset does not wrap periodically", errShiftOBC3D > 1e-6, true)
+
+//// Odd, non-square 2D mesh with different PBC counts on the two in-plane axes.
+SetMesh(5, 3, 1, c, 1.2*c, 0.8*c, 2, 1, 0)
+periodX := 5*c
+periodY := 3*1.2*c
+m = Uniform(0.3, -0.4, 0.8)
+
+// At zero offset, the stray field must match the ordinary demag field.
+sfPBC2D := GetStrayField(0, 0, 0)
+diffPBC2D := Madd(sfPBC2D, B_demag, 1, -1)
+errPBC2D := Sum(Dot(diffPBC2D, diffPBC2D)) / Sum(Dot(B_demag, B_demag))
+Expect("2D PBC zero-offset stray field matches demag", errPBC2D, 0, 1e-5)
+
+// The point (2,1) cells from the origin is inside the base periodic tile.
+// Compare it with the same point shifted by one full tile in X.
+sfInPBC2D := GetStrayField(2*c, 1*1.2*c, 0)
+sfShiftPBC2D := GetStrayField(2*c+periodX, 1*1.2*c, 0)
+diffInPBC2D := Madd(sfInPBC2D, sfShiftPBC2D, 1, -1)
+errInPBC2D := Sum(Dot(diffInPBC2D, diffInPBC2D)) / Sum(Dot(sfInPBC2D, sfInPBC2D))
+Expect("2D PBC in-tile offset repeats after one X period", errInPBC2D, 0, 1e-5)
+
+// Move the same point one period in X and one period in negative Y.
+sfOutPBC2D := GetStrayField(2*c+periodX, 1*1.2*c-periodY, 0)
+diffOutPBC2D := Madd(sfInPBC2D, sfOutPBC2D, 1, -1)
+errOutPBC2D := Sum(Dot(diffOutPBC2D, diffOutPBC2D)) / Sum(Dot(sfInPBC2D, sfInPBC2D))
+Expect("2D PBC partially out-of-tile offset repeats", errOutPBC2D, 0, 1e-5)
+
+// Several periods away in both axes; periodic reduction must not alter the
+// observed field even when the requested offset lies well outside the tile.
+sfFarPBC2D := GetStrayField(2*c+2*periodX, 1*1.2*c-3*periodY, 0)
+diffFarPBC2D := Madd(sfInPBC2D, sfFarPBC2D, 1, -1)
+errFarPBC2D := Sum(Dot(diffFarPBC2D, diffFarPBC2D)) / Sum(Dot(sfInPBC2D, sfInPBC2D))
+Expect("2D PBC multi-period offset repeats", errFarPBC2D, 0, 1e-5)

@@ -426,7 +426,9 @@ func (g *guistate) prepareOnUpdate() {
 			for _, p := range g.Params {
 				n := p.Name()
 				r := g.IntValue("region")
-				if r == -1 && !p.IsUniform() {
+				if u, ok := p.(interface{ unchained() bool }); ok && u.unchained() {
+					g.Set(n, "per-cell")
+				} else if r == -1 && !p.IsUniform() {
 					g.Set(n, "")
 				} else {
 					if r == -1 {

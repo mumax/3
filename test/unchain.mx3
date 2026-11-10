@@ -1,0 +1,76 @@
+/*
+	Tests ext_Unchain / ext_Rechain / ext_SetParamInShape / ext_SetParamMask on alpha.
+	Region-wise and unchained alpha with the same cell values must give the
+	same dynamics (same kernels, same per-cell values; tolerance only covers
+	the non-deterministic summation order of Average()).
+*/
+
+SetGridSize(64, 32, 1)
+SetCellSize(4e-9, 4e-9, 4e-9)
+Msat = 8e5
+Aex = 13e-12
+FixDt = 1e-13
+
+left := XRange(-inf, 0)
+DefRegion(1, left)
+alpha = 0.02
+alpha.SetRegion(1, 0.3)
+a0 := alpha.Average()
+
+// reference: region-wise alpha
+m = Uniform(1, 0.3, 0)
+Run(0.2e-9)
+mxRef := m.Comp(0).Average()
+
+// unchain keeps the region values per cell
+ext_Unchain(alpha)
+expect("unchain average", alpha.Average(), a0, 1e-7)
+expect("unchain region 1", alpha.Region(1).Average(), 0.3, 1e-7)
+expect("unchain region 0", alpha.Region(0).Average(), 0.02, 1e-7)
+
+// same values, now per cell: identical dynamics
+t = 0
+m = Uniform(1, 0.3, 0)
+Run(0.2e-9)
+expect("unchained dynamics", m.Comp(0).Average(), mxRef, 1e-6)
+
+// rebuild the same map with the per-cell setter
+ext_SetParamInShape(alpha, Universe(), 0.02)
+ext_SetParamInShape(alpha, left, 0.3)
+t = 0
+m = Uniform(1, 0.3, 0)
+Run(0.2e-9)
+expect("SetParamInShape dynamics", m.Comp(0).Average(), mxRef, 1e-6)
+
+// per-cell values that regions cannot express: a disk inside region 1
+ext_SetParamInShape(alpha, Circle(40e-9).Transl(-64e-9, 0, 0), 1)
+if alpha.Region(1).Average() < 0.31 {
+	expect("disk raises region 1", alpha.Region(1).Average(), 0.35, 0)
+}
+expect("region 0 untouched", alpha.Region(0).Average(), 0.02, 1e-7)
+
+// round trip through a file
+SaveAs(alpha, "alpha_cells")
+aDisk := alpha.Average()
+ext_SetParamInShape(alpha, Universe(), 0.5)
+ext_SetParamMask(alpha, LoadFile("unchain.out/alpha_cells.ovf"))
+expect("SetParamMask from file", alpha.Average(), aDisk, 1e-7)
+
+// mask built cell by cell: linear gradient along x
+Nx := 64
+mask := NewScalarMask(Nx, 32, 1)
+for i := 0; i < Nx; i++ {
+	for j := 0; j < 32; j++ {
+		mask.SetScalar(i, j, 0, 0.01+0.1*i/(Nx-1))
+	}
+}
+ext_SetParamMask(alpha, mask)
+expect("SetParamMask gradient", alpha.Average(), 0.01+0.1/2, 1e-6)
+
+// rechain restores the original region table
+ext_Rechain(alpha)
+expect("rechain region 1", alpha.GetRegion(1), 0.3, 1e-7)
+expect("rechain region 0", alpha.GetRegion(0), 0.02, 1e-7)
+expect("rechain average", alpha.Average(), a0, 1e-7)
+alpha.SetRegion(1, 0.1) // region setters work again
+expect("rechain setRegion", alpha.GetRegion(1), 0.1, 1e-7)

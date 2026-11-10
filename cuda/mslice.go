@@ -7,8 +7,9 @@ import (
 
 // Slice + scalar multiplier.
 type MSlice struct {
-	arr *data.Slice
-	mul []float64
+	arr  *data.Slice
+	mul  []float64
+	view bool // arr is not owned (not from the buffer pool): Recycle leaves it alone
 }
 
 func ToMSlice(s *data.Slice) MSlice {
@@ -19,7 +20,12 @@ func ToMSlice(s *data.Slice) MSlice {
 }
 
 func MakeMSlice(arr *data.Slice, mul []float64) MSlice {
-	return MSlice{arr, mul}
+	return MSlice{arr: arr, mul: mul}
+}
+
+// ViewMSlice wraps a persistent (non-pooled) slice; Recycle will not free it.
+func ViewMSlice(s *data.Slice) MSlice {
+	return MSlice{arr: s, mul: ones(s.NComp()), view: true}
 }
 
 func (m MSlice) Size() [3]int {
@@ -43,7 +49,7 @@ func (m MSlice) SetMul(c int, mul float32) {
 }
 
 func (m MSlice) Recycle() {
-	if m.arr != nil {
+	if m.arr != nil && !m.view {
 		Recycle(m.arr)
 		m.arr = nil
 	}

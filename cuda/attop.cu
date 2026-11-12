@@ -42,7 +42,7 @@ attop(float* __restrict__ topx, float* __restrict__ topy, float* __restrict__ to
 
     int Iflat = idx(ix, iy, 0);
     topx[Iflat] = srcx[Itop];
-    if (topy == nullptr || topz == nullptr || srcy == nullptr || srcz == nullptr) {
+    if (topy == NULL || topz == NULL || srcy == NULL || srcz == NULL) {
         return;
     }
     topy[Iflat] = srcy[Itop];

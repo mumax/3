@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "stencil.h"
 #include "amul.h"
 

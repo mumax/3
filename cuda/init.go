@@ -1,3 +1,5 @@
+//go:build !hip
+
 // Package cuda provides GPU interaction
 package cuda
 

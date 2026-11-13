@@ -24,6 +24,8 @@ Consider downloading a [pre-compiled mumax³ binary](https://mumax.github.io/dow
 
 If you want to compile nevertheless, 4 essential components will be required to build mumax³: an ***NVIDIA driver***, ***Go***, ***CUDA*** (&leq;12.9) and ***C***.
 
+mumax³ also runs on ***AMD GPUs*** through an opt-in HIP backend: install ***ROCm*** in place of the NVIDIA driver and CUDA toolkit (***Go*** and ***C*** are still needed), then see *Build for AMD GPUs* below.
+
 * *If they are not yet present on your system*: install them as detailed below.
 * *If they are already installed*: check if they work correctly by running the *check* for each component written below.
 
@@ -115,6 +117,26 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
     Apply the changes with `source ~/.bashrc`.
 
 👉 *Check CUDA installation with: `nvcc --version`*
+
+</details>
+
+<details><summary><b><i>Build for AMD GPUs</i></b> (ROCm/HIP, instead of CUDA)</summary>
+
+mumax³ also runs on AMD GPUs through an additive, opt-in HIP backend; the CUDA path is unchanged and remains the default. Instead of the NVIDIA driver and CUDA toolkit, install [ROCm](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/) (the HIP runtime and headers; ROCm 7.2 or newer is recommended). ***Go*** and a ***C*** compiler are still required, as above.
+
+Once ROCm, Go and C are in place, follow the *Building from source* steps below to clone the repository and initialise the Go module, then build the HIP backend instead of running `make`:
+
+```bash
+go install -tags hip github.com/mumax/3/...
+```
+
+The generated HIP wrappers, with the device code already embedded, are committed, so this command needs only the ROCm runtime (no `hipcc`). Unlike the CUDA build you do **not** set `CUDA_CC`: the HIP backend embeds a single generic `amdgcnspirv` image per kernel that the ROCm runtime finalizes for whichever AMD GPU is present at load time, so one build runs on any supported GPU. After editing a `.cu` kernel, regenerate the embedded images with `cd cuda && make wrappers BACKEND=hip` (this step needs `hipcc`; pass `HIPCC=/opt/rocm/bin/hipcc` if it is not on your `PATH`).
+
+The cgo flags default to a ROCm install at `/opt/rocm`; for a different prefix, set `CGO_CFLAGS`/`CGO_LDFLAGS` to its `include` and `lib` directories. The HIP backend builds on Windows ROCm as well, provided the process loads a full ROCm runtime (the one providing `amd_comgr`) so the generic image can be finalized.
+
+Validated on gfx90a (CDNA2), gfx1100 (RDNA3) and gfx1201 (RDNA4).
+
+👉 *Check ROCm installation with: `rocminfo` (lists your GPU) and `hipcc --version`.*
 
 </details>
 

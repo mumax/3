@@ -11,21 +11,16 @@ TODO: godoc everything
 package engine
 
 import (
-	"fmt"
 	"os"
-	"runtime"
 	"sync"
 	"time"
 
-	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 )
 
 const VERSION = "mumax 3.12"
 
-var UNAME = fmt.Sprintf("%s [%s_%s %s(%s) CUDA-%d.%d]",
-	VERSION, runtime.GOOS, runtime.GOARCH, runtime.Version(), runtime.Compiler,
-	cu.CUDA_VERSION/1000, (cu.CUDA_VERSION%1000)/10)
+// UNAME is defined per backend in uname.go (CUDA) and uname_hip.go (HIP).
 
 var StartTime = time.Now()
 

@@ -87,6 +87,10 @@ func Fprintln(filename string, msg ...interface{}) {
 
 // Read a magnetization state from .dump file.
 func LoadFile(fname string) *data.Slice {
+	// Save/SaveAs function write files asynchronously. 
+	// If LoadFile is called immediately after, the file might be still half-written, thus crashing mumax.
+	// Solution: wait until the outputs are written.
+	drainOutput()
 	in, err := httpfs.Open(fname)
 	util.FatalErr(err)
 	var s *data.Slice

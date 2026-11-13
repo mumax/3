@@ -20,6 +20,7 @@ import (
 // input parameter, settable by user
 type regionwise struct {
 	lut
+	cell       *data.Slice               // per-cell values while unchained (ext_Unchain), nil when region-wise
 	upd_reg    [NREGION]func() []float64 // time-dependent values
 	timestamp  float64                   // used not to double-evaluate f(t)
 	children   []derived                 // derived parameters
@@ -35,12 +36,39 @@ func (p *regionwise) init(nComp int, name, unit string, children []derived) {
 }
 
 func (p *regionwise) MSlice() cuda.MSlice {
+	if p.cell != nil {
+		return cuda.ViewMSlice(p.cellBuf())
+	}
 	if p.IsUniform() {
 		return cuda.MakeMSlice(data.NilSlice(p.NComp(), Mesh().Size()), p.getRegion(0))
 	} else {
 		buf, r := p.Slice()
 		util.Assert(r == true)
 		return cuda.ToMSlice(buf)
+	}
+}
+
+// per-cell values when unchained, region table decoded otherwise
+func (p *regionwise) Slice() (*data.Slice, bool) {
+	if p.cell == nil {
+		return p.lut.Slice()
+	}
+	b := cuda.Buffer(p.NComp(), Mesh().Size())
+	data.Copy(b, p.cellBuf())
+	return b, true
+}
+
+func (p *regionwise) EvalTo(dst *data.Slice) {
+	if p.cell == nil {
+		p.lut.EvalTo(dst)
+	} else {
+		data.Copy(dst, p.cellBuf())
+	}
+}
+
+func (p *regionwise) assertChained() {
+	if p.cell != nil {
+		util.Fatal(p.name, " is unchained (per-cell values): region values and time dependence are disabled, call ext_Rechain(", p.name, ") first")
 	}
 }
 
@@ -101,6 +129,7 @@ func (p *regionwise) setUniform(v []float64) {
 
 // set in regions r1..r2(excl)
 func (p *regionwise) setRegions(r1, r2 int, v []float64) {
+	p.assertChained()
 	util.Argument(len(v) == len(p.cpu_buf))
 	util.Argument(r1 < r2) // exclusive upper bound
 	for r := r1; r < r2; r++ {
@@ -117,6 +146,7 @@ func (p *regionwise) bufset_(region int, v []float64) {
 }
 
 func (p *regionwise) setFunc(r1, r2 int, f func() []float64) {
+	p.assertChained()
 	util.Argument(r1 < r2) // exclusive upper bound
 	for r := r1; r < r2; r++ {
 		p.upd_reg[r] = f
@@ -133,6 +163,7 @@ func (p *regionwise) invalidate() {
 }
 
 func (p *regionwise) getRegion(region int) []float64 {
+	p.assertChained()
 	cpu := p.cpuLUT()
 	v := make([]float64, p.NComp())
 	for i := range v {
@@ -142,6 +173,9 @@ func (p *regionwise) getRegion(region int) []float64 {
 }
 
 func (p *regionwise) IsUniform() bool {
+	if p.cell != nil {
+		return false
+	}
 	cpu := p.cpuLUT()
 	v1 := p.getRegion(0)
 	for r := 1; r < NREGION; r++ {
